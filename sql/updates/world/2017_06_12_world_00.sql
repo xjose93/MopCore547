@@ -1,4 +1,4 @@
-DELETE FROM `spell_script_names` WHERE IN `ScriptName` (142842, 142851, 142986);
+DELETE FROM `spell_script_names` WHERE `ScriptName` IN (142842, 142851, 142986);
 
 INSERT INTO `spell_script_names` VALUES
 (142842, 'spell_malkorok_breath_of_yshaarj'),
