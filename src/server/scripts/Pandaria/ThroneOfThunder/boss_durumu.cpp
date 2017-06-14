@@ -174,9 +174,9 @@ uint64 SelecGUIDtRandomPlayerInRage(Creature*me,float range,bool lingering_gaze 
     std::list<Player*> PlayerList;
     GetPlayerListInGrid(PlayerList, me, range);
     if (lingering_gaze)
-        PlayerList.remove_if(WoWSource::UnitAuraCheck(true, SPELL_LINGERING_GAZE_MARKER));
+        PlayerList.remove_if(MoPCore::UnitAuraCheck(true, SPELL_LINGERING_GAZE_MARKER));
     if (!PlayerList.empty())
-    if (Player *target = WoWSource::Containers::SelectRandomContainerElement(PlayerList))
+    if (Player *target = MoPCore::Containers::SelectRandomContainerElement(PlayerList))
             return target->GetGUID();
 
     return 0;
@@ -383,7 +383,7 @@ class boss_durumu : public CreatureScript
 
                 if (!PlayerList.empty())
                     if (Creature * eyeDontMover = me->SummonCreature(RED_EYE,me->GetPositionX(), me->GetPositionY(),me->GetPositionZ()))
-                        if (Player *target = WoWSource::Containers::SelectRandomContainerElement(PlayerList))
+                        if (Player *target = MoPCore::Containers::SelectRandomContainerElement(PlayerList))
                         {
                             eyeDontMover->CastSpell(target, SPELL_RED_BEAM, true);
                             PlayerList.remove(target);
@@ -391,7 +391,7 @@ class boss_durumu : public CreatureScript
                         
                 if (!PlayerList.empty()) // Check again coz we change player list before
                     if (Creature * eyeDontMover = me->SummonCreature(BLUE_EYE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()))
-                        if (Player *target = WoWSource::Containers::SelectRandomContainerElement(PlayerList))
+                        if (Player *target = MoPCore::Containers::SelectRandomContainerElement(PlayerList))
                             eyeDontMover->CastSpell(target, SPELL_BLUE_BEAM, true);
             }
 

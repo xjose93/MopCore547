@@ -794,7 +794,7 @@ class WorldObject : public Object, public WorldLocation
         uint64 m_explicitSeerGuid;
 };
 
-namespace WoWSource
+namespace MoPCore
 {
     template<class T>
     void RandomResizeList(std::list<T> &_list, uint32 _size)

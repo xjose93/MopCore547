@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2012-2016 WoWSource <http://wowsource.info/>
+* Copyright (C) 2012-2016 MoPCore <http://MoPCore.info/>
 *
 */
 
@@ -122,8 +122,8 @@ public:
 
         void GetTargets()
         {
-            WoWSource::AnyUnitInObjectRangeCheck u_check(me, 100.0f);
-            WoWSource::UnitListSearcher<WoWSource::AnyUnitInObjectRangeCheck> searcher(me, targets, u_check);
+            MoPCore::AnyUnitInObjectRangeCheck u_check(me, 100.0f);
+            MoPCore::UnitListSearcher<MoPCore::AnyUnitInObjectRangeCheck> searcher(me, targets, u_check);
             me->VisitNearbyObject(100.0f, searcher);
             if (!targets.empty())
                 for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
@@ -366,8 +366,8 @@ public:
         void AddQuestComplete()
         {
             std::list<Player*> players;
-            WoWSource::AnyPlayerInObjectRangeCheck checker(me, 35.0f);
-            WoWSource::PlayerListSearcher<WoWSource::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+            MoPCore::AnyPlayerInObjectRangeCheck checker(me, 35.0f);
+            MoPCore::PlayerListSearcher<MoPCore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
             me->VisitNearbyWorldObject(35.0f, searcher);
 
             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
@@ -484,8 +484,8 @@ public:
                             me->MonsterYell("Mekkatorque-Ray!", 0, 0);
 
                             std::list<Unit*> BeamTarget;
-                            WoWSource::AnyUnitInObjectRangeCheck checker(me, 15);
-                            WoWSource::UnitListSearcher<WoWSource::AnyUnitInObjectRangeCheck> searcher(me, BeamTarget, checker);
+                            MoPCore::AnyUnitInObjectRangeCheck checker(me, 15);
+                            MoPCore::UnitListSearcher<MoPCore::AnyUnitInObjectRangeCheck> searcher(me, BeamTarget, checker);
                             me->VisitNearbyWorldObject(15.0f, searcher);
 
                             for (std::list<Unit*>::iterator itr = BeamTarget.begin(); itr != BeamTarget.end(); ++itr)
