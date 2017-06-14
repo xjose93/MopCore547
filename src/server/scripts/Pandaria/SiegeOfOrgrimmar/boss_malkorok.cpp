@@ -21,8 +21,8 @@ enum Spells
     SPELL_BREATH_OF_YSHAARJ      = 142842,
     SPELL_BREATH_DAMAGE          = 142816,
 
-	SPELL_FATAL_STRIKES          = 146254,
-	SPELL_RELENTLESS_ASSAULT     = 143261,
+    SPELL_FATAL_STRIKES          = 146254,
+    SPELL_RELENTLESS_ASSAULT     = 143261,
 
     SPELL_ANCIENT_BARRIER_L      = 142864,
     SPELL_ANCIENT_BARRIER_M      = 142865,
@@ -30,7 +30,7 @@ enum Spells
     SPELL_ANCIENT_MIASMA_VIS     = 143018,
     SPELL_ANCIENT_MIASMA_DMG     = 142906,
 
-	SPELL_BLOOD_RAGE             = 142879,
+    SPELL_BLOOD_RAGE             = 142879,
     SPELL_BLOOD_RAGE_DMG         = 142890,
 };
 
@@ -41,9 +41,9 @@ enum Events
     EVENT_SEISMIC_SLAM         = 3,
     EVENT_BREATH_OF_YSHARRJ    = 4,
     EVENT_IMPLODING_ENERGY     = 5,
-	EVENT_REGENERATE_POWER     = 6,
-	EVENT_PHASE_ONE            = 7,
-	EVENT_PHASE_TWO            = 8,
+    EVENT_REGENERATE_POWER     = 6,
+    EVENT_PHASE_ONE            = 7,
+    EVENT_PHASE_TWO            = 8,
 };
 
 enum Phases
@@ -62,7 +62,7 @@ enum Creatures
     CREATURE_ARCING_SMASH   = 71455,
     CREATURE_ANCIENT_MIASMA = 71513,
     CREATURE_IMPLOSION      = 71470,
-	MAX_CREATURES           = 3,
+    MAX_CREATURES           = 3,
 };
 
 enum Talk
@@ -81,9 +81,9 @@ const Position centerPos = { 1914.38f, -4950.57f, -198.96f, 3.77f };
 
 uint8 creaturesToDespawn[MAX_CREATURES] =
 {
-	CREATURE_ARCING_SMASH,
-	CREATURE_ANCIENT_MIASMA,
-	CREATURE_IMPLOSION
+    CREATURE_ARCING_SMASH,
+    CREATURE_ANCIENT_MIASMA,
+    CREATURE_IMPLOSION
 };
 
 static void DespawnCreaturesInArea(uint32 entry, WorldObject* object)
@@ -123,23 +123,23 @@ class boss_malkorok : public CreatureScript
                 events.Reset();
                 events.SetPhase(PHASE_ONE);
 
-				for (uint8 i = 0; i < Creatures::MAX_CREATURES; ++i)
-					DespawnCreaturesInArea(creaturesToDespawn[i], me);
+                for (uint8 i = 0; i < Creatures::MAX_CREATURES; ++i)
+                    DespawnCreaturesInArea(creaturesToDespawn[i], me);
             }
 
             void JustDied(Unit* /*killer*/) override
             {
-				_JustDied();
+                _JustDied();
                 Talk(MALKOROK_DEATH);
-				
-				for (uint8 i = 0; i < Creatures::MAX_CREATURES; ++i)
-					DespawnCreaturesInArea(creaturesToDespawn[i], me);
+                
+                for (uint8 i = 0; i < Creatures::MAX_CREATURES; ++i)
+                    DespawnCreaturesInArea(creaturesToDespawn[i], me);
             }
             
             void MovementInform(uint32 type, uint32 id) override
             {
-				if (GetPhase() != PHASE_ONE)
-					return;
+                if (GetPhase() != PHASE_ONE)
+                    return;
 
                 Talk(MALKOROK_ARCING_SMASH);
                 
@@ -173,17 +173,17 @@ class boss_malkorok : public CreatureScript
 
             void EnterCombat(Unit* unit) override
             {
-				_EnterCombat();
+                _EnterCombat();
                 Talk(MALKOROK_AGGRO);
                 me->SummonCreature(CREATURE_ANCIENT_MIASMA, centerPos, TEMPSUMMON_MANUAL_DESPAWN);
 
                 events.SetPhase(PHASE_ONE);
                 events.ScheduleEvent(EVENT_ARCING_SMASH_FIRST, 11000, 0, PHASE_ONE);
                 events.ScheduleEvent(EVENT_SEISMIC_SLAM, 5000, 0, PHASE_ONE);
-				events.ScheduleEvent(EVENT_BREATH_OF_YSHARRJ, 68000, 0, PHASE_ONE);
-				events.ScheduleEvent(EVENT_REGENERATE_POWER, 833, 0, PHASE_ONE);
-				events.ScheduleEvent(EVENT_PHASE_TWO, 120000, 0, PHASE_ONE);
-				SetPhase(PHASE_ONE);
+                events.ScheduleEvent(EVENT_BREATH_OF_YSHARRJ, 68000, 0, PHASE_ONE);
+                events.ScheduleEvent(EVENT_REGENERATE_POWER, 833, 0, PHASE_ONE);
+                events.ScheduleEvent(EVENT_PHASE_TWO, 120000, 0, PHASE_ONE);
+                SetPhase(PHASE_ONE);
             }
 
             void UpdateAI(const uint32 diff) override
@@ -194,9 +194,9 @@ class boss_malkorok : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-				if (GetPhase() == PHASE_TWO)
+                if (GetPhase() == PHASE_TWO)
                 {
-					me->SetPower(Powers::POWER_RAGE, 0);
+                    me->SetPower(Powers::POWER_RAGE, 0);
                     if (!me->HasUnitState(UNIT_STATE_CASTING) && me->isAttackReady() && me->IsWithinMeleeRange(me->getVictim()))
                     {
                         DoCastVictim(SPELL_BLOOD_RAGE_DMG, true);
@@ -212,8 +212,8 @@ class boss_malkorok : public CreatureScript
                 {
                     case EVENT_ARCING_SMASH:
                     {
-						if (GetPhase() != PHASE_ONE)
-							break;
+                        if (GetPhase() != PHASE_ONE)
+                            break;
 
                         DoCast(me, SPELL_ARCING_SMASH_JUMP);
                         events.ScheduleEvent(EVENT_IMPLODING_ENERGY, 5000); // 10 secs after arcing smash it explodes
@@ -223,8 +223,8 @@ class boss_malkorok : public CreatureScript
 
                     case EVENT_BREATH_OF_YSHARRJ:
                     {
-						if (GetPhase() != PHASE_ONE)
-							break;
+                        if (GetPhase() != PHASE_ONE)
+                            break;
 
                         DoCastAOE(SPELL_BREATH_OF_YSHAARJ);
 
@@ -234,8 +234,8 @@ class boss_malkorok : public CreatureScript
 
                     case EVENT_SEISMIC_SLAM:
                     {
-						if (GetPhase() != PHASE_ONE)
-							break;
+                        if (GetPhase() != PHASE_ONE)
+                            break;
 
                         DoCastAOE(SPELL_SEISMIC_SLAM);
 
@@ -245,8 +245,8 @@ class boss_malkorok : public CreatureScript
 
                     case EVENT_IMPLODING_ENERGY:
                     {
-						if (GetPhase() != PHASE_ONE)
-							break;
+                        if (GetPhase() != PHASE_ONE)
+                            break;
 
                         std::list<Position> positions;
 
@@ -276,56 +276,56 @@ class boss_malkorok : public CreatureScript
                         break;
                     }
 
-					case EVENT_REGENERATE_POWER:
-					{
-						if (GetPhase() != PHASE_ONE)
-							break;
+                    case EVENT_REGENERATE_POWER:
+                    {
+                        if (GetPhase() != PHASE_ONE)
+                            break;
 
-						me->SetPower(Powers::POWER_RAGE, me->GetPower(Powers::POWER_RAGE) + 10);
-						events.ScheduleEvent(EVENT_REGENERATE_POWER, 833, 0, PHASE_ONE);
-					}
+                        me->SetPower(Powers::POWER_RAGE, me->GetPower(Powers::POWER_RAGE) + 10);
+                        events.ScheduleEvent(EVENT_REGENERATE_POWER, 833, 0, PHASE_ONE);
+                    }
 
-					case EVENT_PHASE_TWO:
-					{
-						if (GetPhase() != PHASE_ONE)
-							break;
+                    case EVENT_PHASE_TWO:
+                    {
+                        if (GetPhase() != PHASE_ONE)
+                            break;
 
-						events.SetPhase(PHASE_TWO);
-						SetPhase(PHASE_TWO);
-						DespawnCreaturesInArea(CREATURE_ANCIENT_MIASMA, me);
+                        events.SetPhase(PHASE_TWO);
+                        SetPhase(PHASE_TWO);
+                        DespawnCreaturesInArea(CREATURE_ANCIENT_MIASMA, me);
 
-						me->SetPower(Powers::POWER_RAGE, 0);
-						DoCast(me, SPELL_BLOOD_RAGE);
-						events.ScheduleEvent(EVENT_PHASE_ONE, 20000, 0, PHASE_TWO);
-						break;
-					}
+                        me->SetPower(Powers::POWER_RAGE, 0);
+                        DoCast(me, SPELL_BLOOD_RAGE);
+                        events.ScheduleEvent(EVENT_PHASE_ONE, 20000, 0, PHASE_TWO);
+                        break;
+                    }
 
-					case EVENT_PHASE_ONE:
-					{
-						me->SummonCreature(CREATURE_ANCIENT_MIASMA, centerPos, TEMPSUMMON_MANUAL_DESPAWN);
+                    case EVENT_PHASE_ONE:
+                    {
+                        me->SummonCreature(CREATURE_ANCIENT_MIASMA, centerPos, TEMPSUMMON_MANUAL_DESPAWN);
 
-						events.SetPhase(PHASE_ONE);
-						events.ScheduleEvent(EVENT_ARCING_SMASH_FIRST, 11000, 0, PHASE_ONE);
-						events.ScheduleEvent(EVENT_SEISMIC_SLAM, 5000, 0, PHASE_ONE);
-						events.ScheduleEvent(EVENT_BREATH_OF_YSHARRJ, 68000, 0, PHASE_ONE);
-						events.ScheduleEvent(EVENT_REGENERATE_POWER, 833, 0, PHASE_ONE);
-						events.ScheduleEvent(EVENT_PHASE_TWO, 120000, 0, PHASE_ONE);
-						SetPhase(PHASE_ONE);
-						break;
-					}
+                        events.SetPhase(PHASE_ONE);
+                        events.ScheduleEvent(EVENT_ARCING_SMASH_FIRST, 11000, 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_SEISMIC_SLAM, 5000, 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_BREATH_OF_YSHARRJ, 68000, 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_REGENERATE_POWER, 833, 0, PHASE_ONE);
+                        events.ScheduleEvent(EVENT_PHASE_TWO, 120000, 0, PHASE_ONE);
+                        SetPhase(PHASE_ONE);
+                        break;
+                    }
                 }
             }
 
-			private:
-				uint8 m_phaseId;
+            private:
+                uint8 m_phaseId;
 
-				uint8 GetPhase() { return m_phaseId; }
-				void SetPhase(uint8 phaseId) { m_phaseId = phaseId; }
+                uint8 GetPhase() { return m_phaseId; }
+                void SetPhase(uint8 phaseId) { m_phaseId = phaseId; }
         };
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new boss_malkorokAI(pCreature);
+            return new boss_malkorokAI(creature);
         }
 };
 
@@ -371,9 +371,9 @@ class npc_ancient_miasma : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_ancient_miasmaAI(pCreature);
+            return new npc_ancient_miasmaAI(creature);
         }
 };
 
@@ -496,7 +496,7 @@ class spell_malkorok_breath_of_yshaarj : public SpellScriptLoader
             void HandleHitTarget(SpellEffIndex /*effIndex*/)
             {
                 if (Unit* target = GetHitUnit())
-					target->CastSpell(target, SPELL_BREATH_DAMAGE, true);
+                    target->CastSpell(target, SPELL_BREATH_DAMAGE, true);
             }
 
             void Register() override
@@ -526,12 +526,11 @@ class spell_malkorok_seismic_slam : public SpellScriptLoader
                 if (!GetCaster())
                     return;
 
-                if (Creature* pCreature = GetCaster()->ToCreature())
+                if (Creature* creature = GetCaster()->ToCreature())
                 {
-                    Unit* target = NULL;
-                    target = pCreature->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, -15.0f, true);
+                    Unit* target = creature->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, -15.0f, true);
                     if (!target)
-                        target = pCreature->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true);
+                        target = creature->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true);
                     
                     if (target)
                     {
@@ -577,12 +576,8 @@ class spell_malkorok_imploding_energy_dmg : public SpellScriptLoader
                     return;
 
                 if (targets.empty())
-                {
-                    if (Creature* pCreature = GetCaster()->ToCreature())
-                    {
-                        pCreature->AI()->DoAction(ACTION_IMPLOSION_DAMAGE);
-                    }
-                }
+                    if (Creature* creature = GetCaster()->ToCreature())
+                        creature->AI()->DoAction(ACTION_IMPLOSION_DAMAGE);
             }
 
             void Register() override
@@ -603,7 +598,7 @@ void AddSC_malkorok()
 
     new npc_ancient_miasma();                  // 71513
     new npc_malkorok_implosion();              // 71470
-	new npc_malkorok_arcing_smash();           // 71455 needs sql
+    new npc_malkorok_arcing_smash();           // 71455 needs sql
 
     new spell_malkorok_breath_of_yshaarj();    // 142842
     new spell_malkorok_seismic_slam();         // 142851
