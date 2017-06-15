@@ -387,7 +387,7 @@ class npc_soo_lorewalker_cho : public CreatureScript
                     events.ScheduleEvent(EVENT_TALK_1, 2000);
             }
             
-            void DoAction(int32 action)
+            void DoAction(int32 const action)
             {
                 switch (action)
                 {
