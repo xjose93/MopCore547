@@ -613,7 +613,7 @@ void AddSC_malkorok()
 
     new npc_ancient_miasma();                  // 71513
     new npc_malkorok_implosion();              // 71470
-    new npc_malkorok_arcing_smash();           // 71455 needs sql
+    new npc_malkorok_arcing_smash();           // 71455
 
     new spell_malkorok_breath_of_yshaarj();    // 142842
     new spell_malkorok_seismic_slam();         // 142851
