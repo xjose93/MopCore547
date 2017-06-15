@@ -1055,7 +1055,7 @@ public:
 			if (_textSays && who->GetTypeId() != TYPEID_PLAYER)
 				return;
 
-			if (!_textSays && me->IsWithinDistInMap(who, 5.0f) && who->GetTypeId() == TYPEID_PLAYER && who->isAlive())
+			if (!_textSays && me->IsWithinDistInMap(who, 5.0f) && who->GetTypeId() == TYPEID_PLAYER && who->IsAlive())
 			{
 				_events.ScheduleEvent(EVENT_TEXT_1, 1 * IN_MILLISECONDS);
 				who = m_player;
@@ -1063,7 +1063,7 @@ public:
 			}
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff) override
 		{
 			_events.Update(diff);
 

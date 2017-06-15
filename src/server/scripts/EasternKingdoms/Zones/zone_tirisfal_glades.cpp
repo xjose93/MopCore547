@@ -406,7 +406,7 @@ public:
 				m_phase = 2;
 				break;
 			case 2:
-				if (m_npc && m_npc->isAlive())
+				if (m_npc && m_npc->IsAlive())
 				{
 					m_npc->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_KNEEL);
 					m_npc->SetFacingToObject(me);
@@ -435,7 +435,7 @@ public:
 				m_phase = 7;
 				break;
 			case 7:
-				if (m_npc && m_npc->isAlive())
+				if (m_npc && m_npc->IsAlive())
 				{
 					m_npc->AddAura(93460, m_npc);
 					m_npc->CastSpell(m_npc, 93460);
@@ -446,7 +446,7 @@ public:
 				m_phase = 8;
 				break;
 			case 8:
-				if (m_npc && m_npc->isAlive())
+				if (m_npc && m_npc->IsAlive())
 				{
 					m_npc->HandleEmote(EMOTE_ONESHOT_TALK);
 					m_npc->AI()->Talk(0);
@@ -455,13 +455,13 @@ public:
 				m_phase = 9;
 				break;
 			case 9:
-				if (m_npc && m_npc->isAlive())
+				if (m_npc && m_npc->IsAlive())
 					m_npc->HandleEmote(EMOTE_ONESHOT_SALUTE);
 				m_timer = 2500;
 				m_phase = 10;
 				break;
 			case 10:
-				if (m_npc && m_npc->isAlive())
+				if (m_npc && m_npc->IsAlive())
 					m_npc->GetMotionMaster()->MovePath(5041401, false);
 				m_timer = urand(15000, 45000);
 				m_phase = 0;
