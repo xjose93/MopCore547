@@ -2045,6 +2045,48 @@ Creature* WorldObject::FindNearestCreature(uint32 entry, float range, bool alive
     return creature;
 }
 
+std::list<Creature*> WorldObject::FindNearestCreatures(uint32 entry, float range) const
+{
+    std::list<Creature*> creatureList;    
+    GetCreatureListWithEntryInGrid(creatureList, entry, range);   
+    return creatureList;
+}
+
+std::list<Creature*> WorldObject::FindNearestCreatures(std::list<uint32> entrys, float range) const
+{
+    std::list<Creature*> creatureList;
+    for (std::list<uint32>::iterator itr = entrys.begin(); itr != entrys.end(); ++itr)
+        GetCreatureListWithEntryInGrid(creatureList, (*itr), range);
+    return creatureList;
+}
+
+std::vector<Creature*> WorldObject::FindNearestCreatures(uint32 entry, float range, bool alive) const
+{
+    std::list<Creature*> creatureList;
+    std::vector<Creature*> returnList;
+    GetCreatureListWithEntryInGrid(creatureList, entry, range);
+    
+    for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+    {
+        if ((*itr)->IsAlive() == alive)
+            returnList.push_back(*itr);
+    }
+    return returnList;
+}
+
+Creature* WorldObject::FindRandomCreatureInRange(uint32 entry, float range, bool alive)
+{
+    Creature* creature = nullptr;
+    std::list<Creature*> cList = FindNearestCreatures(entry, range);
+    if (cList.empty())
+        return NULL;
+
+    uint32 rol = urand(0, cList.size() - 1);
+    std::list<Creature*>::const_iterator itr = cList.begin();
+    std::advance(itr, rol);
+    return *itr;
+}
+
 GameObject* WorldObject::FindNearestGameObject(uint32 entry, float range) const
 {
     GameObject* go = NULL;
@@ -2052,6 +2094,13 @@ GameObject* WorldObject::FindNearestGameObject(uint32 entry, float range) const
     MoPCore::GameObjectLastSearcher<MoPCore::NearestGameObjectEntryInObjectRangeCheck> searcher(this, go, checker);
     VisitNearbyGridObject(range, searcher);
     return go;
+}
+
+std::list<GameObject*> WorldObject::FindNearestGameObjects(uint32 entry, float range) const
+{
+    std::list<GameObject*> goList;
+    GetGameObjectListWithEntryInGrid(goList, entry, range);
+    return goList;
 }
 
 GameObject* WorldObject::FindNearestGameObjectOfType(GameobjectTypes type, float range) const
@@ -2070,6 +2119,36 @@ Player* WorldObject::FindNearestPlayer(float range, bool alive)
     MoPCore::PlayerSearcher<MoPCore::AnyPlayerInObjectRangeCheck> searcher(this, player, check);
     VisitNearbyWorldObject(range, searcher);
     return player;
+}
+
+std::list<Player*> WorldObject::FindNearestPlayers(float range, bool alive)
+{
+    std::list<Player*> PlayerList; 
+    MoPCore::AnyPlayerInObjectRangeCheck checker(this, range, alive);
+    MoPCore::PlayerListSearcher<MoPCore::AnyPlayerInObjectRangeCheck> searcher(this, PlayerList, checker);
+    VisitNearbyWorldObject(range, searcher);
+    return PlayerList;
+}
+
+Player* WorldObject::FindRandomPlayerInRange(float range, bool alive)
+{
+    Player* player = nullptr;
+    std::list<Player*> pList = FindNearestPlayers(range, alive);
+    if (pList.empty())
+        return NULL;
+
+    uint32 rol = urand(0, pList.size() - 1);
+    std::list<Player*>::const_iterator itr = pList.begin();
+    std::advance(itr, rol);
+    return *itr;
+}
+
+bool WorldObject::IsPlayerInRange(float range)
+{
+    if (Player* player = FindNearestPlayer(range, true))
+        return true;
+
+    return false;
 }
 
 void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>& gameobjectList, uint32 entry, float maxSearchRange) const
