@@ -305,6 +305,7 @@ public:
     }
 };
 
+// Lorewalker Cho 73330.
 enum LorewalkerChoTexts
 {
     TALK_1 = 0, // Ah.. we adventure together again, except this time.. I'm afraid circumstances are much.. more die (38120)
