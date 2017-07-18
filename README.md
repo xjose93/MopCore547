@@ -12,9 +12,9 @@ https://mega.nz/#!cZc30S6T!6R9zAlXkKE2ekBf7ZdnN_pQBnOxK5pyG3LNPEXT-0mU
 3) If you don't have Mists of Pandaria alredy, then just put this .exe file in empty folder start it and
    after it is done loading exit game and change your config.wtf to your desired realmlist.
    
-4) Dbc, Maps, Mmaps and Vmaps can be found here:
+4) Dbc, Db2, Maps, Mmaps and Vmaps can be found here:
 
-https://mega.nz/#!oFAmXLQL!W-aGfJrsD5OPv5kIfB98Xp3bpmk8QD9kvtkThIeEXoI
+https://mega.nz/#!oN4AGLxZ!Bz6m_ZR9tGwfLyiU7xMUgnb4mgiF7QxUjRVLqHkd6IQ
 
 
 If you want to join our team you can just open issue requesting an invite and we will add you.
