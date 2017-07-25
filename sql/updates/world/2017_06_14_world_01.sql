@@ -47,16 +47,20 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN((@BP_ENTRY*100)+0, (@BP_ENTRY*100)+1, (@BP_ENTRY*100)+2, (@BP_ENTRY*100)+3) AND `source_type`=9;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 ((@BP_ENTRY*100)+0, 9, 0, 0, 0, 0, 100, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 19, @SI_ENTRY, 10, 0, 0, 0, 0, 0, 'Stormwind Infantry - Yell For Help'),
-((@BP_ENTRY*100)+0, 9, 1, 0, 0, 0, 100, 1, 600, 600, 0, 0, 11, 66097, 0, 0, 0, 0, 0, 19, @SI_ENTRY, 10, 0, 0, 0, 0, 0, 'Brother Paxton - Cast Penance'),
-((@BP_ENTRY*100)+0, 9, 2, 0, 0, 0, 100, 1, 600, 600, 0, 0, 1, 2, 5000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Brother Paxton - Say Text'),
+((@BP_ENTRY*100)+0, 9, 1, 0, 0, 0, 100, 1, 1000, 1000, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, @SI_ENTRY, 10, 0, 0, 0, 0, 0, 'Brother Paxton - Set Orientation'),
+((@BP_ENTRY*100)+0, 9, 2, 0, 0, 0, 100, 1, 2000, 2000, 0, 0, 11, 66097, 0, 0, 0, 0, 0, 19, @SI_ENTRY, 10, 0, 0, 0, 0, 0, 'Brother Paxton - Cast Penance'),
+((@BP_ENTRY*100)+0, 9, 3, 0, 0, 0, 100, 1, 1000, 1000, 0, 0, 1, 2, 5000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Brother Paxton - Say Text'),
 ((@BP_ENTRY*100)+1, 9, 0, 0, 0, 0, 100, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 19, @SI_ENTRY, 10, 0, 0, 0, 0, 0, 'Stormwind Infantry - Yell For Help'),
-((@BP_ENTRY*100)+1, 9, 1, 0, 0, 0, 100, 1, 600, 600, 0, 0, 11, 38588, 0, 0, 0, 0, 0, 19, @SI_ENTRY, 10, 0, 0, 0, 0, 0, 'Brother Paxton - Cast Flash Heal'),
-((@BP_ENTRY*100)+1, 9, 2, 0, 0, 0, 100, 1, 600, 600, 0, 0, 1, 2, 5000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Brother Paxton - Say Text'),
+((@BP_ENTRY*100)+1, 9, 1, 0, 0, 0, 100, 1, 1000, 1000, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, @SI_ENTRY, 10, 0, 0, 0, 0, 0, 'Brother Paxton - Set Orientation'),
+((@BP_ENTRY*100)+1, 9, 2, 0, 0, 0, 100, 1, 2000, 2000, 0, 0, 11, 38588, 0, 0, 0, 0, 0, 19, @SI_ENTRY, 10, 0, 0, 0, 0, 0, 'Brother Paxton - Cast Flash Heal'),
+((@BP_ENTRY*100)+1, 9, 3, 0, 0, 0, 100, 1, 1000, 1000, 0, 0, 1, 2, 5000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Brother Paxton - Say Text'),
 ((@BP_ENTRY*100)+2, 9, 0, 0, 0, 0, 100, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 19, @SI_ENTRY, 10, 0, 0, 0, 0, 0, 'Stormwind Infantry - Yell For Help'),
-((@BP_ENTRY*100)+2, 9, 1, 0, 0, 0, 100, 1, 600, 600, 0, 0, 11, 8362, 0, 0, 0, 0, 0, 19, @SI_ENTRY, 10, 0, 0, 0, 0, 0, 'Brother Paxton - Cast Renew'),
-((@BP_ENTRY*100)+2, 9, 2, 0, 0, 0, 100, 1, 600, 600, 0, 0, 1, 0, 5000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Brother Paxton - Say Text'),
-((@BP_ENTRY*100)+3, 9, 0, 0, 0, 0, 100, 1, 0, 0, 0, 0, 11, 93091, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Brother Paxton - Cast AOE Heal'),
-((@BP_ENTRY*100)+3, 9, 1, 0, 0, 0, 100, 1, 600, 600, 0, 0, 1, 1, 5000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Brother Paxton - Say Text');
+((@BP_ENTRY*100)+2, 9, 1, 0, 0, 0, 100, 1, 1000, 1000, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, @SI_ENTRY, 10, 0, 0, 0, 0, 0, 'Brother Paxton - Set Orientation'),
+((@BP_ENTRY*100)+2, 9, 2, 0, 0, 0, 100, 1, 2000, 2000, 0, 0, 11, 8362, 0, 0, 0, 0, 0, 19, @SI_ENTRY, 10, 0, 0, 0, 0, 0, 'Brother Paxton - Cast Renew'),
+((@BP_ENTRY*100)+2, 9, 3, 0, 0, 0, 100, 1, 1000, 1000, 0, 0, 1, 0, 5000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Brother Paxton - Say Text'),
+((@BP_ENTRY*100)+3, 9, 0, 0, 0, 0, 100, 1, 1000, 1000, 0, 0, 11, 93091, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Brother Paxton - Cast AOE Heal'),
+((@BP_ENTRY*100)+3, 9, 1, 0, 0, 0, 100, 1, 1000, 1000, 0, 0, 1, 1, 5000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Brother Paxton - Say Text');
+
 DELETE FROM `creature_text` WHERE `entry` IN (@BP_ENTRY, @SI_ENTRY);
 INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `comment`) VALUES
 (@BP_ENTRY, 0, 0, 'BY THE LIGHT BE RENEWED!', 12, 0, 100, 0, 0, 0, 'Brother Paxton - Renew Cast Phrase'),
@@ -68,3 +72,15 @@ INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language
 (@SI_ENTRY, 0, 1, 'I need a heal!', 12, 0, 100, 0, 0, 0, 'Stormwind Infantry - Call For Heal'),
 (@SI_ENTRY, 0, 2, 'I could use a heal, brother!', 12, 0, 100, 0, 0, 0, 'Stormwind Infantry - Call For Heal'),
 (@SI_ENTRY, 0, 3, 'Make yourself useful and heal me, Paxton!', 12, 0, 100, 0, 0, 0, 'Stormwind Infantry - Call For Heal');
+
+DELETE FROM `locales_creature_text` WHERE `entry` IN (@BP_ENTRY, @SI_ENTRY);
+INSERT INTO `locales_creature_text` (`entry`, `textGroup`, `id`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`, `text_loc9`, `text_loc10`) VALUES
+(@BP_ENTRY, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ДА ИСЦЕЛИТ ТЕБЯ СВЕТ!', NULL, NULL),
+(@BP_ENTRY, 1, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'НЫНЕ ВОЗЛАГАЮ НА ТЕБЯ РУКИ!', NULL, NULL),
+(@BP_ENTRY, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Да озарит тебя Свет!', NULL, NULL),
+(@BP_ENTRY, 2, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Исцелись, брат!', NULL, NULL),
+(@BP_ENTRY, 2, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ВОЗВРАЩАЙСЯ В СТРОЙ, БРАТ!', NULL, NULL),
+(@SI_ENTRY, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ПОМОГИ МНЕ!', NULL, NULL),
+(@SI_ENTRY, 0, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Излечи меня!', NULL, NULL),
+(@SI_ENTRY, 0, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Излечи меня, брат!', NULL, NULL),
+(@SI_ENTRY, 0, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Пакстон, приди мне на помощь и исцели меня!', NULL, NULL);
