@@ -26,7 +26,7 @@ echo    ````````````$````````$
 echo    ````````````$````````$  *SmartAI Lab scripts*
 echo    $$$```$$$``$$$``$$$``$
 echo    $``$`````$``$``$```$`$$$$$    Mists of Pandaria 5.4.x Version
-echo    $$$```$$$$``$``$`````$```$          for JadeCoreDB original
+echo    $$$```$$$$``$``$`````$```$          for MopCoreDB original
 echo    $````$```$``$``$```$`$```$         
 echo    $`````$$$$``$$``$$$``$```$ 
 echo.
