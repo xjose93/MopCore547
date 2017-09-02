@@ -16,6 +16,10 @@ https://mega.nz/#!cZc30S6T!6R9zAlXkKE2ekBf7ZdnN_pQBnOxK5pyG3LNPEXT-0mU
 
 https://mega.nz/#!oN4AGLxZ!Bz6m_ZR9tGwfLyiU7xMUgnb4mgiF7QxUjRVLqHkd6IQ
 
+5) Repack MopCore547-v13062017 for Quick Test here:
+
+https://mega.nz/#!ydtVBZJQ!winN-pZhwwDzB5u_kVrq9CzSpotjXzQXr4kObqDyQd0
+
 
 If you want to join our team you can just open issue requesting an invite and we will add you.
 
