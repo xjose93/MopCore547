@@ -29,15 +29,10 @@ Pandaria Raids:
 -- Terrace of Endless Spring
 -- Throne of Thunder
 
-The Maelstrom Zones:
-
--- The Wandering Isle
-
 Mists of Pandaria Start Zones Quests ( 1-5 lvl ) TODO:
 
 -- Undead
 -- Troll
--- Draenei
 -- Worgen
 -- Goblin
 -- Blood Elf
