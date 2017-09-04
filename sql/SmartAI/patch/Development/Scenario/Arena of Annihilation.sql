@@ -52,19 +52,3 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,0,1,0,2,0,100,1,0,40,0,0,11,123928,2,0,0,0,0,1,0,0,0,0,0,0,0,'Cast Stone Spin at 40% HP');
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

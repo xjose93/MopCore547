@@ -36,7 +36,6 @@ The Maelstrom Zones:
 Mists of Pandaria Start Zones Quests ( 1-5 lvl ) TODO:
 
 -- Undead
--- Night Elf
 -- Tauren
 -- Troll
 -- Draenei
