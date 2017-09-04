@@ -31,7 +31,6 @@ Pandaria Raids:
 
 Mists of Pandaria Start Zones Quests ( 1-5 lvl ) TODO:
 
--- Undead
 -- Troll
 -- Worgen
 -- Goblin
