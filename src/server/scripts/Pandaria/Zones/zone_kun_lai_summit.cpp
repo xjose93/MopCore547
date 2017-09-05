@@ -19,6 +19,19 @@ enum eNessosEvents
     EVENT_SMOKED_BLADE        = 4,
 };
 
+enum Texts
+{
+	SAY_AHONE_WANDERER_AGGRO 	= 0,
+	SAY_SKITHIK_AGGRO 			= 1,
+	SAY_NESSOS_ORACLE_AGGRO 	= 2,
+	SAY_HAVAK_AGGRO				= 3,
+	SAY_BORGINN_DARKFIST_AGGRO	= 4,
+	SAY_KORDA_TORROS_AGGRO		= 5,
+	SAY_ZAI_OUTCAST_AGGRO		= 6,
+	SAY_SCRITCH_AGGRO			= 7
+
+};
+
 class mob_nessos_the_oracle : public CreatureScript
 {
     public:
@@ -46,6 +59,11 @@ class mob_nessos_the_oracle : public CreatureScript
                 events.ScheduleEvent(EVENT_VICIOUS_REND,      7000);
                 events.ScheduleEvent(EVENT_GRAPPLING_HOOK, 17000);
                 events.ScheduleEvent(EVENT_VANISH, 12000);
+            }
+
+            void EnterCombat(Unit* /*who*/)
+            {
+            	Talk(SAY_NESSOS_ORACLE_AGGRO);
             }
 
             void JustDied(Unit* /*killer*/)
@@ -83,6 +101,104 @@ class mob_nessos_the_oracle : public CreatureScript
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                                 me->CastSpell(target, SPELL_SMOKED_BLADE, false);
 
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                DoMeleeAttackIfReady();
+            }
+        };
+};
+
+enum eAhoneWandererSpells
+{
+    SPELL_CHI_BURST                     =   125817,
+    SPELL_HEALING_MIST                  =   125802,
+    SPELL_SPINNING_CRANE_KICK           =   125799
+};
+
+enum eAhoneWandererEvents
+{
+    EVENT_CHI_BURST                   = 1,
+    EVENT_HEALING_MIST                = 2,
+    EVENT_SPINNING_CRANE_KICK         = 3
+};
+
+class mob_ahone_the_wanderer : public CreatureScript
+{
+    public:
+        mob_ahone_the_wanderer() : CreatureScript("mob_ahone_the_wanderer")
+        {
+        }
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new mob_ahone_the_wandererAI(creature);
+        }
+
+        struct mob_ahone_the_wandererAI : public ScriptedAI
+        {
+            mob_ahone_the_wandererAI(Creature* creature) : ScriptedAI(creature)
+            {
+            }
+
+            EventMap events;
+
+            void Reset()
+            {
+                events.Reset();
+
+                events.ScheduleEvent(EVENT_CHI_BURST,   10000);
+                events.ScheduleEvent(EVENT_HEALING_MIST,     15000);
+                events.ScheduleEvent(EVENT_SPINNING_CRANE_KICK,  5000);          
+            }
+            void EnterCombat(Unit* /*who*/)
+            {
+            	Talk(SAY_AHONE_WANDERER_AGGRO);
+            }
+
+
+
+            void JustDied(Unit* /*killer*/)
+            {
+            }
+
+            void JustSummoned(Creature* summon)
+            {
+                summon->DespawnOrUnsummon(12000);
+            }
+
+            void UpdateAI(const uint32 diff)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                events.Update(diff);
+
+
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case EVENT_CHI_BURST:
+                            if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
+                                me->CastSpell(target, SPELL_CHI_BURST, false);
+                            events.ScheduleEvent(EVENT_CHI_BURST,       5000);
+                            break;
+                        case EVENT_HEALING_MIST:
+                            if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
+                                me->CastSpell(target, SPELL_HEALING_MIST, false);
+                            events.ScheduleEvent(EVENT_HEALING_MIST, 35000);
+                            break;
+                        case EVENT_SPINNING_CRANE_KICK:
+                            if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
+                                me->CastSpell(target, SPELL_SPINNING_CRANE_KICK, false);
+                            events.ScheduleEvent(EVENT_SPINNING_CRANE_KICK, 15000);
                             break;
                         default:
                             break;
@@ -136,6 +252,11 @@ class mob_ski_thik : public CreatureScript
                 events.ScheduleEvent(EVENT_BLADE_FURY,       8000);
                 events.ScheduleEvent(EVENT_TORNADO,         40000);
                 events.ScheduleEvent(EVENT_WINDSONG,        32000);
+            }
+
+            void EnterCombat(Unit* /*who*/)
+            {
+            	Talk(SAY_SKITHIK_AGGRO);
             }
 
             void JustDied(Unit* /*killer*/)
@@ -236,6 +357,11 @@ class mob_havak : public CreatureScript
                 events.ScheduleEvent(EVENT_TITANIC_STRENGH,   32000);
             }
 
+            void EnterCombat(Unit* /*who*/)
+            {
+            	Talk(SAY_HAVAK_AGGRO);
+            }
+
             void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
@@ -274,6 +400,185 @@ class mob_havak : public CreatureScript
                 DoMeleeAttackIfReady();
             }
         };
+};
+
+enum eBorginnDarkfistSpells
+{
+    SPELL_SHADOWBOLT = 125212,
+    SPELL_VOIDCLOUD = 125241,
+};
+
+enum eBorginnDarkfistEvents
+{
+    EVENT_SHADOWBOLT = 1,
+    EVENT_VOIDCLOUD = 2,
+};
+
+class mob_borginn_darkfist : public CreatureScript
+{
+public:
+    mob_borginn_darkfist() : CreatureScript("mob_borginn_darkfist")
+    {
+    }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new mob_borginn_darkfistAI(creature);
+    }
+
+    struct mob_borginn_darkfistAI : public ScriptedAI
+    {
+        mob_borginn_darkfistAI(Creature* creature) : ScriptedAI(creature)
+        {
+        }
+
+        EventMap events;
+
+        void Reset()
+        {
+            events.Reset();
+
+            events.ScheduleEvent(EVENT_SHADOWBOLT, 50000);
+            events.ScheduleEvent(EVENT_VOIDCLOUD, 15000);
+        }
+
+        void EnterCombat(Unit* /*who*/)
+        {
+        	Talk(SAY_BORGINN_DARKFIST_AGGRO);
+        }
+
+        void JustDied(Unit* /*killer*/)
+        {
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            events.Update(diff);
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_SHADOWBOLT:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
+                        me->CastSpell(target, SPELL_SHADOWBOLT, false);
+                    events.ScheduleEvent(EVENT_SHADOWBOLT, 70000);
+                    break;
+                case EVENT_VOIDCLOUD:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
+                        me->CastSpell(target, SPELL_VOIDCLOUD, false);
+                    events.ScheduleEvent(EVENT_VOIDCLOUD, 35000);
+                    break;
+                default:
+                    break;
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+};
+
+enum eScritchSpells
+{
+    SPELL_GOING_BANANAS = 125363,
+    SPELL_BANANARANG = 125311,
+    SPELL_TOSS_FILTH = 125365
+};
+
+enum eScritchEvents
+{
+    EVENT_GOING_BANANAS = 1,
+    EVENT_BANANARANG = 2,
+    EVENT_TOSS_FILTH = 3
+};
+
+class mob_scritch : public CreatureScript
+{
+public:
+    mob_scritch() : CreatureScript("mob_scritch")
+    {
+    }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new mob_scritchAI(creature);
+    }
+
+    struct mob_scritchAI : public ScriptedAI
+    {
+        mob_scritchAI(Creature* creature) : ScriptedAI(creature)
+        {
+        }
+
+        EventMap events;
+
+        void Reset()
+        {
+            events.Reset();
+
+            events.ScheduleEvent(EVENT_GOING_BANANAS, 12000);
+            events.ScheduleEvent(EVENT_BANANARANG, 8000);
+            events.ScheduleEvent(EVENT_TOSS_FILTH, 15000);
+        }
+
+        void EnterCombat(Unit* /*who*/)
+        {
+        	Talk(SAY_SCRITCH_AGGRO);
+		}
+
+        void JustDied(Unit* /*killer*/)
+        {
+        }
+
+        void JustSummoned(Creature* summon)
+        {
+            summon->DespawnOrUnsummon(12000);
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            events.Update(diff);
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_GOING_BANANAS:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
+                        me->CastSpell(target, SPELL_GOING_BANANAS, false);
+                    events.ScheduleEvent(EVENT_GOING_BANANAS, 10000);
+                    break;
+                case EVENT_BANANARANG:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
+                        me->CastSpell(target, SPELL_BANANARANG, false);
+                    events.ScheduleEvent(EVENT_BANANARANG, 20000);
+                    break;
+                case EVENT_TOSS_FILTH:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
+                        me->CastSpell(target, SPELL_TOSS_FILTH, false);
+                    events.ScheduleEvent(EVENT_TOSS_FILTH, 15000);
+                    break;
+                default:
+                    break;
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
 };
 
 enum eMogujiaSoulCallerSpells
@@ -349,6 +654,107 @@ class mob_mogujia_soul_caller : public CreatureScript
                             events.ScheduleEvent(EVENT_SHADOW_CRASH, 32000);
                             break;
 							
+                        default:
+                            break;
+                    }
+                }
+
+                DoMeleeAttackIfReady();
+            }
+        };
+};
+
+enum eKordaTorrosSpells
+{
+    SPELL_BELLOWING_RAGE        =   124297,
+    SPELL_EMPOWERING_FLAMES     =   130388,
+    SPELL_HOOF_STOMP            =   124289,
+    SPELL_RUSHING_CHARGE        =   124302
+};
+
+enum eKordaTorrosEvents
+{
+    EVENT_BELLOWING_RAGE        = 1,
+    EVENT_EMPOWERING_FLAMES     = 2,
+    EVENT_HOOF_STOMP            = 3,    
+    EVENT_RUSHING_CHARGE        = 4
+};
+
+
+class mob_korda_torros : public CreatureScript
+{
+    public:
+        mob_korda_torros() : CreatureScript("mob_korda_torros")
+        {
+        }
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new mob_korda_torrosAI(creature);
+        }
+
+        struct mob_korda_torrosAI : public ScriptedAI
+        {
+            mob_korda_torrosAI(Creature* creature) : ScriptedAI(creature)
+            {
+            }
+
+            EventMap events;
+
+            void Reset()
+            {
+                events.Reset();
+
+                events.ScheduleEvent(EVENT_BELLOWING_RAGE,   20000);
+                events.ScheduleEvent(EVENT_HOOF_STOMP,  10000);
+                events.ScheduleEvent(EVENT_RUSHING_CHARGE, 10000);            
+            }
+
+            void EnterCombat(Unit* /*who*/)
+            {
+            	Talk(SAY_KORDA_TORROS_AGGRO);
+            }
+
+
+            void JustDied(Unit* /*killer*/)
+            {
+            }
+
+            void JustSummoned(Creature* summon)
+            {
+                summon->DespawnOrUnsummon(12000);
+            }
+
+            void UpdateAI(const uint32 diff)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                events.Update(diff);
+
+
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case EVENT_BELLOWING_RAGE:
+                            if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
+                                me->CastSpell(target, SPELL_BELLOWING_RAGE, false);
+                            events.ScheduleEvent(EVENT_BELLOWING_RAGE,       30000);
+                            break;
+                        case EVENT_HOOF_STOMP:
+                            if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
+                                me->CastSpell(target, SPELL_HOOF_STOMP, false);
+                            events.ScheduleEvent(EVENT_HOOF_STOMP, 15000);
+                            break;
+                        case EVENT_RUSHING_CHARGE:
+                                if(Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
+                                    me->CastSpell(target, SPELL_RUSHING_CHARGE, false);
+                                events.ScheduleEvent(EVENT_RUSHING_CHARGE, 10000);
+                                break;
                         default:
                             break;
                     }
@@ -468,6 +874,11 @@ class mob_zai_the_outcast : public CreatureScript
                 events.ScheduleEvent(EVENT_WATER_BOLT,      32000);
             }
 
+            void EnterCombat(Unit* /*who*/)
+            {
+            	Talk(SAY_ZAI_OUTCAST_AGGRO);
+            }
+
             void JustDied(Unit* /*killer*/)
             {
             }
@@ -524,6 +935,10 @@ class mob_zai_the_outcast : public CreatureScript
 
 void AddSC_kun_lai_summit()
 {
+    new mob_ahone_the_wanderer();
+    new mob_scritch();
+    new mob_korda_torros();
+    new mob_borginn_darkfist();
     new mob_nessos_the_oracle();
     new mob_ski_thik();
     new mob_havak();
