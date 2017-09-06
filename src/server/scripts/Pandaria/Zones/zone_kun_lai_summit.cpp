@@ -5,39 +5,36 @@
 
 enum eNessosSpells
 {
-    SPELL_VICIOUS_REND        = 125624,
-    SPELL_GRAPPLING_HOOK      = 125623,
-    SPELL_VANISH              = 125632,
-    SPELL_SMOKED_BLADE        = 125633,
+    SPELL_VICIOUS_REND          = 125624,
+    SPELL_GRAPPLING_HOOK        = 125623,
+    SPELL_VANISH                = 125632,
+    SPELL_SMOKED_BLADE          = 125633,
 };
 
 enum eNessosEvents
 {
-    EVENT_VICIOUS_REND        = 1,
-    EVENT_GRAPPLING_HOOK      = 2,
-    EVENT_VANISH              = 3,
-    EVENT_SMOKED_BLADE        = 4,
+    EVENT_VICIOUS_REND          = 1,
+    EVENT_GRAPPLING_HOOK        = 2,
+    EVENT_VANISH                = 3,
+    EVENT_SMOKED_BLADE          = 4,
 };
 
 enum Texts
 {
-	SAY_AHONE_WANDERER_AGGRO 	= 0,
-	SAY_SKITHIK_AGGRO 			= 1,
-	SAY_NESSOS_ORACLE_AGGRO 	= 2,
-	SAY_HAVAK_AGGRO				= 3,
-	SAY_BORGINN_DARKFIST_AGGRO	= 4,
-	SAY_KORDA_TORROS_AGGRO		= 5,
-	SAY_ZAI_OUTCAST_AGGRO		= 6,
-	SAY_SCRITCH_AGGRO			= 7
-
+    SAY_AHONE_WANDERER_AGGRO    = 0,
+    SAY_SKITHIK_AGGRO           = 1,
+    SAY_NESSOS_ORACLE_AGGRO     = 2,
+    SAY_HAVAK_AGGRO             = 3,
+    SAY_BORGINN_DARKFIST_AGGRO  = 4,
+    SAY_KORDA_TORROS_AGGRO      = 5,
+    SAY_ZAI_OUTCAST_AGGRO       = 6,
+    SAY_SCRITCH_AGGRO           = 7
 };
 
 class mob_nessos_the_oracle : public CreatureScript
 {
     public:
-        mob_nessos_the_oracle() : CreatureScript("mob_nessos_the_oracle") 
-		{ 
-		}
+        mob_nessos_the_oracle() : CreatureScript("mob_nessos_the_oracle") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -46,29 +43,25 @@ class mob_nessos_the_oracle : public CreatureScript
 
         struct mob_nessos_the_oracleAI : public ScriptedAI
         {
-            mob_nessos_the_oracleAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
+            mob_nessos_the_oracleAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
 
             void Reset()
             {
                 events.Reset();
-                
-                events.ScheduleEvent(EVENT_VICIOUS_REND,      7000);
-                events.ScheduleEvent(EVENT_GRAPPLING_HOOK, 17000);
-                events.ScheduleEvent(EVENT_VANISH, 12000);
+
+                events.ScheduleEvent(EVENT_VICIOUS_REND, 7 * IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_GRAPPLING_HOOK, 17 * IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_VANISH, 12 * IN_MILLISECONDS);
             }
 
             void EnterCombat(Unit* /*who*/)
             {
-            	Talk(SAY_NESSOS_ORACLE_AGGRO);
+                Talk(SAY_NESSOS_ORACLE_AGGRO);
             }
 
-            void JustDied(Unit* /*killer*/)
-            {
-            }
+            void JustDied(Unit* /*killer*/) { }
 
             void UpdateAI(const uint32 diff)
             {
@@ -76,7 +69,6 @@ class mob_nessos_the_oracle : public CreatureScript
                     return;
 
                 events.Update(diff);
-                
 
                 while (uint32 eventId = events.ExecuteEvent())
                 {
@@ -85,22 +77,21 @@ class mob_nessos_the_oracle : public CreatureScript
                         case EVENT_VICIOUS_REND:
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                                 me->CastSpell(target, SPELL_VICIOUS_REND, false);
-                            events.ScheduleEvent(EVENT_VICIOUS_REND,      7000);
+                            events.ScheduleEvent(EVENT_VICIOUS_REND, 7 * IN_MILLISECONDS);
                             break;
                         case EVENT_GRAPPLING_HOOK:
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                                 me->CastSpell(target, SPELL_GRAPPLING_HOOK, false);
-                            events.ScheduleEvent(EVENT_GRAPPLING_HOOK, 17000);
+                            events.ScheduleEvent(EVENT_GRAPPLING_HOOK, 17 * IN_MILLISECONDS);
                             break;
                         case EVENT_VANISH:
                             me->CastSpell(me, SPELL_VANISH, false);
-                            events.ScheduleEvent(EVENT_VANISH, 20000);
-                            events.ScheduleEvent(EVENT_SMOKED_BLADE, urand(0, 8000));
+                            events.ScheduleEvent(EVENT_VANISH, 20 * IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_SMOKED_BLADE, urand(0, 8) * IN_MILLISECONDS);
                             break;
                         case EVENT_SMOKED_BLADE:
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                                 me->CastSpell(target, SPELL_SMOKED_BLADE, false);
-
                             break;
                         default:
                             break;
@@ -114,9 +105,9 @@ class mob_nessos_the_oracle : public CreatureScript
 
 enum eAhoneWandererSpells
 {
-    SPELL_CHI_BURST                     =   125817,
-    SPELL_HEALING_MIST                  =   125802,
-    SPELL_SPINNING_CRANE_KICK           =   125799
+    SPELL_CHI_BURST                   =   125817,
+    SPELL_HEALING_MIST                =   125802,
+    SPELL_SPINNING_CRANE_KICK         =   125799
 };
 
 enum eAhoneWandererEvents
@@ -129,9 +120,7 @@ enum eAhoneWandererEvents
 class mob_ahone_the_wanderer : public CreatureScript
 {
     public:
-        mob_ahone_the_wanderer() : CreatureScript("mob_ahone_the_wanderer")
-        {
-        }
+        mob_ahone_the_wanderer() : CreatureScript("mob_ahone_the_wanderer") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -140,9 +129,7 @@ class mob_ahone_the_wanderer : public CreatureScript
 
         struct mob_ahone_the_wandererAI : public ScriptedAI
         {
-            mob_ahone_the_wandererAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
+            mob_ahone_the_wandererAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
 
@@ -150,24 +137,21 @@ class mob_ahone_the_wanderer : public CreatureScript
             {
                 events.Reset();
 
-                events.ScheduleEvent(EVENT_CHI_BURST,   10000);
-                events.ScheduleEvent(EVENT_HEALING_MIST,     15000);
-                events.ScheduleEvent(EVENT_SPINNING_CRANE_KICK,  5000);          
+                events.ScheduleEvent(EVENT_CHI_BURST, 10 * IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_HEALING_MIST, 15 * IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_SPINNING_CRANE_KICK, 5 * IN_MILLISECONDS);          
             }
+
             void EnterCombat(Unit* /*who*/)
             {
-            	Talk(SAY_AHONE_WANDERER_AGGRO);
+                Talk(SAY_AHONE_WANDERER_AGGRO);
             }
 
-
-
-            void JustDied(Unit* /*killer*/)
-            {
-            }
+            void JustDied(Unit* /*killer*/) { }
 
             void JustSummoned(Creature* summon)
             {
-                summon->DespawnOrUnsummon(12000);
+                summon->DespawnOrUnsummon(12 * IN_MILLISECONDS);
             }
 
             void UpdateAI(const uint32 diff)
@@ -180,7 +164,6 @@ class mob_ahone_the_wanderer : public CreatureScript
 
                 events.Update(diff);
 
-
                 while (uint32 eventId = events.ExecuteEvent())
                 {
                     switch (eventId)
@@ -188,17 +171,17 @@ class mob_ahone_the_wanderer : public CreatureScript
                         case EVENT_CHI_BURST:
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                                 me->CastSpell(target, SPELL_CHI_BURST, false);
-                            events.ScheduleEvent(EVENT_CHI_BURST,       5000);
+                            events.ScheduleEvent(EVENT_CHI_BURST, 5 * IN_MILLISECONDS);
                             break;
                         case EVENT_HEALING_MIST:
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                                 me->CastSpell(target, SPELL_HEALING_MIST, false);
-                            events.ScheduleEvent(EVENT_HEALING_MIST, 35000);
+                            events.ScheduleEvent(EVENT_HEALING_MIST, 35 * IN_MILLISECONDS);
                             break;
                         case EVENT_SPINNING_CRANE_KICK:
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                                 me->CastSpell(target, SPELL_SPINNING_CRANE_KICK, false);
-                            events.ScheduleEvent(EVENT_SPINNING_CRANE_KICK, 15000);
+                            events.ScheduleEvent(EVENT_SPINNING_CRANE_KICK, 15 * IN_MILLISECONDS);
                             break;
                         default:
                             break;
@@ -215,22 +198,25 @@ enum eSkiThikSpells
     SPELL_BLADE_FURY    = 125370,
     SPELL_TORNADO       = 125398,
     SPELL_TORNADO_DMG   = 131693,
-    SPELL_WINDSONG      = 125373,
+    SPELL_WINDSONG      = 125373
 };
 
 enum eSkiThikEvents
 {
     EVENT_BLADE_FURY    = 1,
     EVENT_TORNADO       = 2,
-    EVENT_WINDSONG      = 3,
+    EVENT_WINDSONG      = 3
+};
+
+enum eSkiThikCreatures
+{
+    NPC_TORNADO_ST      = 64267
 };
 
 class mob_ski_thik : public CreatureScript
 {
     public:
-        mob_ski_thik() : CreatureScript("mob_ski_thik") 
-		{ 
-		}
+        mob_ski_thik() : CreatureScript("mob_ski_thik") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -239,9 +225,7 @@ class mob_ski_thik : public CreatureScript
 
         struct mob_ski_thikAI : public ScriptedAI
         {
-            mob_ski_thikAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
+            mob_ski_thikAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
 
@@ -249,23 +233,21 @@ class mob_ski_thik : public CreatureScript
             {
                 events.Reset();
                 
-                events.ScheduleEvent(EVENT_BLADE_FURY,       8000);
-                events.ScheduleEvent(EVENT_TORNADO,         40000);
-                events.ScheduleEvent(EVENT_WINDSONG,        32000);
+                events.ScheduleEvent(EVENT_BLADE_FURY, 8 * IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_TORNADO, 40 * IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_WINDSONG, 32 * IN_MILLISECONDS);
             }
 
             void EnterCombat(Unit* /*who*/)
             {
-            	Talk(SAY_SKITHIK_AGGRO);
+                Talk(SAY_SKITHIK_AGGRO);
             }
 
-            void JustDied(Unit* /*killer*/)
-            {
-            }
+            void JustDied(Unit* /*killer*/) { }
 
             void JustSummoned(Creature* summon)
             {
-                if (summon->GetEntry() == 64267)
+                if (summon->GetEntry() == NPC_TORNADO_ST)
                 {
                     summon->AddAura(SPELL_TORNADO_DMG, summon);
                     summon->SetReactState(REACT_PASSIVE);
@@ -282,7 +264,6 @@ class mob_ski_thik : public CreatureScript
                     return;
 
                 events.Update(diff);
-                
 
                 while (uint32 eventId = events.ExecuteEvent())
                 {
@@ -291,19 +272,18 @@ class mob_ski_thik : public CreatureScript
                         case EVENT_BLADE_FURY:
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                                 me->CastSpell(target, SPELL_BLADE_FURY, false);
-                            events.ScheduleEvent(EVENT_BLADE_FURY,      8000);
+                            events.ScheduleEvent(EVENT_BLADE_FURY, 8 * IN_MILLISECONDS);
                             break;
                         case EVENT_TORNADO:
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                                 me->CastSpell(target, SPELL_TORNADO, false);
-                            events.ScheduleEvent(EVENT_TORNADO, 40000);
+                            events.ScheduleEvent(EVENT_TORNADO, 40 * IN_MILLISECONDS);
                             break;
                         case EVENT_WINDSONG:
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                                 me->CastSpell(target, SPELL_WINDSONG, false);
-                            events.ScheduleEvent(EVENT_WINDSONG, 32000);
+                            events.ScheduleEvent(EVENT_WINDSONG, 32 * IN_MILLISECONDS);
                             break;
-
                         default:
                             break;
                     }
@@ -318,22 +298,20 @@ enum eHavakSpells
 {
     SPELL_DEVASTATING_ARC      = 124946,
     SPELL_SUMMON_QUILEN        = 124980,
-    SPELL_TITANIC_STRENGH      = 124976,
+    SPELL_TITANIC_STRENGH      = 124976
 };
 
 enum eHavakEvents
 {
-    EVENT_DEVASTATING_ARC		= 1,
+    EVENT_DEVASTATING_ARC       = 1,
     EVENT_SUMMON_QUILEN         = 2,
-    EVENT_TITANIC_STRENGH       = 3,
+    EVENT_TITANIC_STRENGH       = 3
 };
 
 class mob_havak : public CreatureScript
 {
     public:
-        mob_havak() : CreatureScript("mob_havak")
-        {
-        }
+        mob_havak() : CreatureScript("mob_havak") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -342,9 +320,7 @@ class mob_havak : public CreatureScript
 
         struct mob_havakAI : public ScriptedAI
         {
-            mob_havakAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
+            mob_havakAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
 
@@ -352,14 +328,14 @@ class mob_havak : public CreatureScript
             {
                 events.Reset();
 
-                events.ScheduleEvent(EVENT_DEVASTATING_ARC,   50000);
-                events.ScheduleEvent(EVENT_SUMMON_QUILEN,     15000);
-                events.ScheduleEvent(EVENT_TITANIC_STRENGH,   32000);
+                events.ScheduleEvent(EVENT_DEVASTATING_ARC, 50 * IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_SUMMON_QUILEN, 15 * IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_TITANIC_STRENGH, 32 * IN_MILLISECONDS);
             }
 
             void EnterCombat(Unit* /*who*/)
             {
-            	Talk(SAY_HAVAK_AGGRO);
+                Talk(SAY_HAVAK_AGGRO);
             }
 
             void UpdateAI(const uint32 diff)
@@ -379,19 +355,18 @@ class mob_havak : public CreatureScript
                         case EVENT_DEVASTATING_ARC:
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                                 me->CastSpell(target, SPELL_DEVASTATING_ARC, false);
-                            events.ScheduleEvent(EVENT_DEVASTATING_ARC,      50000);
+                            events.ScheduleEvent(EVENT_DEVASTATING_ARC, 50 * IN_MILLISECONDS);
                             break;
                         case EVENT_SUMMON_QUILEN:
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                                 me->CastSpell(target, SPELL_SUMMON_QUILEN, false);
-                            events.ScheduleEvent(EVENT_SUMMON_QUILEN, 80000);
+                            events.ScheduleEvent(EVENT_SUMMON_QUILEN, 80 * IN_MILLISECONDS);
                             break;
                         case EVENT_TITANIC_STRENGH:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                                 me->CastSpell(target, SPELL_TITANIC_STRENGH, false);
-                            events.ScheduleEvent(EVENT_TITANIC_STRENGH, 40000);
+                            events.ScheduleEvent(EVENT_TITANIC_STRENGH, 40 * IN_MILLISECONDS);
                             break;
-
                         default:
                             break;
                     }
@@ -405,21 +380,19 @@ class mob_havak : public CreatureScript
 enum eBorginnDarkfistSpells
 {
     SPELL_SHADOWBOLT = 125212,
-    SPELL_VOIDCLOUD = 125241,
+    SPELL_VOIDCLOUD  = 125241
 };
 
 enum eBorginnDarkfistEvents
 {
     EVENT_SHADOWBOLT = 1,
-    EVENT_VOIDCLOUD = 2,
+    EVENT_VOIDCLOUD  = 2
 };
 
 class mob_borginn_darkfist : public CreatureScript
 {
 public:
-    mob_borginn_darkfist() : CreatureScript("mob_borginn_darkfist")
-    {
-    }
+    mob_borginn_darkfist() : CreatureScript("mob_borginn_darkfist") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -428,9 +401,7 @@ public:
 
     struct mob_borginn_darkfistAI : public ScriptedAI
     {
-        mob_borginn_darkfistAI(Creature* creature) : ScriptedAI(creature)
-        {
-        }
+        mob_borginn_darkfistAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
 
@@ -438,18 +409,16 @@ public:
         {
             events.Reset();
 
-            events.ScheduleEvent(EVENT_SHADOWBOLT, 50000);
-            events.ScheduleEvent(EVENT_VOIDCLOUD, 15000);
+            events.ScheduleEvent(EVENT_SHADOWBOLT, 50 * IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_VOIDCLOUD, 15 * IN_MILLISECONDS);
         }
 
         void EnterCombat(Unit* /*who*/)
         {
-        	Talk(SAY_BORGINN_DARKFIST_AGGRO);
+            Talk(SAY_BORGINN_DARKFIST_AGGRO);
         }
 
-        void JustDied(Unit* /*killer*/)
-        {
-        }
+        void JustDied(Unit* /*killer*/) { }
 
         void UpdateAI(const uint32 diff)
         {
@@ -468,12 +437,12 @@ public:
                 case EVENT_SHADOWBOLT:
                     if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                         me->CastSpell(target, SPELL_SHADOWBOLT, false);
-                    events.ScheduleEvent(EVENT_SHADOWBOLT, 70000);
+                    events.ScheduleEvent(EVENT_SHADOWBOLT, 70 * IN_MILLISECONDS);
                     break;
                 case EVENT_VOIDCLOUD:
                     if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                         me->CastSpell(target, SPELL_VOIDCLOUD, false);
-                    events.ScheduleEvent(EVENT_VOIDCLOUD, 35000);
+                    events.ScheduleEvent(EVENT_VOIDCLOUD, 35 * IN_MILLISECONDS);
                     break;
                 default:
                     break;
@@ -488,23 +457,21 @@ public:
 enum eScritchSpells
 {
     SPELL_GOING_BANANAS = 125363,
-    SPELL_BANANARANG = 125311,
-    SPELL_TOSS_FILTH = 125365
+    SPELL_BANANARANG    = 125311,
+    SPELL_TOSS_FILTH    = 125365
 };
 
 enum eScritchEvents
 {
     EVENT_GOING_BANANAS = 1,
-    EVENT_BANANARANG = 2,
-    EVENT_TOSS_FILTH = 3
+    EVENT_BANANARANG    = 2,
+    EVENT_TOSS_FILTH    = 3
 };
 
 class mob_scritch : public CreatureScript
 {
 public:
-    mob_scritch() : CreatureScript("mob_scritch")
-    {
-    }
+    mob_scritch() : CreatureScript("mob_scritch") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -513,9 +480,7 @@ public:
 
     struct mob_scritchAI : public ScriptedAI
     {
-        mob_scritchAI(Creature* creature) : ScriptedAI(creature)
-        {
-        }
+        mob_scritchAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
 
@@ -523,23 +488,21 @@ public:
         {
             events.Reset();
 
-            events.ScheduleEvent(EVENT_GOING_BANANAS, 12000);
-            events.ScheduleEvent(EVENT_BANANARANG, 8000);
-            events.ScheduleEvent(EVENT_TOSS_FILTH, 15000);
+            events.ScheduleEvent(EVENT_GOING_BANANAS, 12 * IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_BANANARANG, 8 * IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_TOSS_FILTH, 15 * IN_MILLISECONDS);
         }
 
         void EnterCombat(Unit* /*who*/)
         {
-        	Talk(SAY_SCRITCH_AGGRO);
-		}
-
-        void JustDied(Unit* /*killer*/)
-        {
+            Talk(SAY_SCRITCH_AGGRO);
         }
+
+        void JustDied(Unit* /*killer*/) { }
 
         void JustSummoned(Creature* summon)
         {
-            summon->DespawnOrUnsummon(12000);
+            summon->DespawnOrUnsummon(12 * IN_MILLISECONDS);
         }
 
         void UpdateAI(const uint32 diff)
@@ -559,17 +522,17 @@ public:
                 case EVENT_GOING_BANANAS:
                     if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                         me->CastSpell(target, SPELL_GOING_BANANAS, false);
-                    events.ScheduleEvent(EVENT_GOING_BANANAS, 10000);
+                    events.ScheduleEvent(EVENT_GOING_BANANAS, 10 * IN_MILLISECONDS);
                     break;
                 case EVENT_BANANARANG:
                     if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                         me->CastSpell(target, SPELL_BANANARANG, false);
-                    events.ScheduleEvent(EVENT_BANANARANG, 20000);
+                    events.ScheduleEvent(EVENT_BANANARANG, 20 * IN_MILLISECONDS);
                     break;
                 case EVENT_TOSS_FILTH:
                     if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                         me->CastSpell(target, SPELL_TOSS_FILTH, false);
-                    events.ScheduleEvent(EVENT_TOSS_FILTH, 15000);
+                    events.ScheduleEvent(EVENT_TOSS_FILTH, 15 * IN_MILLISECONDS);
                     break;
                 default:
                     break;
@@ -583,24 +546,22 @@ public:
 
 enum eMogujiaSoulCallerSpells
 {
-    SPELL_DRAIN_LIFE        =  84533,
-    SPELL_SHADOW_BOLT       =   9613,
-    SPELL_SHADOW_CRASH      = 129132,
+    SPELL_DRAIN_LIFE        = 84533,
+    SPELL_SHADOW_BOLT       = 9613,
+    SPELL_SHADOW_CRASH      = 129132
 };
 
 enum eMogujiaSoulCallerEvents
 {
-    EVENT_DRAIN_LIFE		= 1,
+    EVENT_DRAIN_LIFE        = 1,
     EVENT_SHADOW_BOLT       = 2,
-    EVENT_SHADOW_CRASH      = 3,
+    EVENT_SHADOW_CRASH      = 3
 };
 
 class mob_mogujia_soul_caller : public CreatureScript
 {
     public:
-        mob_mogujia_soul_caller() : CreatureScript("mob_mogujia_soul_caller") 
-		{ 
-		}
+        mob_mogujia_soul_caller() : CreatureScript("mob_mogujia_soul_caller") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -609,9 +570,7 @@ class mob_mogujia_soul_caller : public CreatureScript
 
         struct mob_mogujia_soul_callerAI : public ScriptedAI
         {
-            mob_mogujia_soul_callerAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
+            mob_mogujia_soul_callerAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
 
@@ -619,9 +578,9 @@ class mob_mogujia_soul_caller : public CreatureScript
             {
                 events.Reset();
                 
-                events.ScheduleEvent(EVENT_DRAIN_LIFE,      20000);
-                events.ScheduleEvent(EVENT_SHADOW_BOLT,     15000);
-                events.ScheduleEvent(EVENT_SHADOW_CRASH,    32000);
+                events.ScheduleEvent(EVENT_DRAIN_LIFE, 20 * IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_SHADOW_BOLT, 15 * IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_SHADOW_CRASH, 32 * IN_MILLISECONDS);
             }
 
             void UpdateAI(const uint32 diff)
@@ -641,19 +600,18 @@ class mob_mogujia_soul_caller : public CreatureScript
                         case EVENT_DRAIN_LIFE:
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                                 me->CastSpell(target, SPELL_DRAIN_LIFE, false);
-                            events.ScheduleEvent(EVENT_DRAIN_LIFE,      20000);
+                            events.ScheduleEvent(EVENT_DRAIN_LIFE, 20 * IN_MILLISECONDS);
                             break;
                         case EVENT_SHADOW_BOLT:
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                                 me->CastSpell(target, SPELL_SHADOW_BOLT, false);
-                            events.ScheduleEvent(EVENT_SHADOW_BOLT, 15000);
+                            events.ScheduleEvent(EVENT_SHADOW_BOLT, 15 * IN_MILLISECONDS);
                             break;
                         case EVENT_SHADOW_CRASH:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                                 me->CastSpell(target, SPELL_SHADOW_CRASH, false);
-                            events.ScheduleEvent(EVENT_SHADOW_CRASH, 32000);
+                            events.ScheduleEvent(EVENT_SHADOW_CRASH, 32 * IN_MILLISECONDS);
                             break;
-							
                         default:
                             break;
                     }
@@ -680,13 +638,10 @@ enum eKordaTorrosEvents
     EVENT_RUSHING_CHARGE        = 4
 };
 
-
 class mob_korda_torros : public CreatureScript
 {
     public:
-        mob_korda_torros() : CreatureScript("mob_korda_torros")
-        {
-        }
+        mob_korda_torros() : CreatureScript("mob_korda_torros") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -695,9 +650,7 @@ class mob_korda_torros : public CreatureScript
 
         struct mob_korda_torrosAI : public ScriptedAI
         {
-            mob_korda_torrosAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
+            mob_korda_torrosAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
 
@@ -705,24 +658,21 @@ class mob_korda_torros : public CreatureScript
             {
                 events.Reset();
 
-                events.ScheduleEvent(EVENT_BELLOWING_RAGE,   20000);
-                events.ScheduleEvent(EVENT_HOOF_STOMP,  10000);
-                events.ScheduleEvent(EVENT_RUSHING_CHARGE, 10000);            
+                events.ScheduleEvent(EVENT_BELLOWING_RAGE, 20 * IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_HOOF_STOMP, 10 * IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_RUSHING_CHARGE, 10 * IN_MILLISECONDS);            
             }
 
             void EnterCombat(Unit* /*who*/)
             {
-            	Talk(SAY_KORDA_TORROS_AGGRO);
+                Talk(SAY_KORDA_TORROS_AGGRO);
             }
 
-
-            void JustDied(Unit* /*killer*/)
-            {
-            }
+            void JustDied(Unit* /*killer*/) { }
 
             void JustSummoned(Creature* summon)
             {
-                summon->DespawnOrUnsummon(12000);
+                summon->DespawnOrUnsummon(12 * IN_MILLISECONDS);
             }
 
             void UpdateAI(const uint32 diff)
@@ -735,7 +685,6 @@ class mob_korda_torros : public CreatureScript
 
                 events.Update(diff);
 
-
                 while (uint32 eventId = events.ExecuteEvent())
                 {
                     switch (eventId)
@@ -743,17 +692,17 @@ class mob_korda_torros : public CreatureScript
                         case EVENT_BELLOWING_RAGE:
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                                 me->CastSpell(target, SPELL_BELLOWING_RAGE, false);
-                            events.ScheduleEvent(EVENT_BELLOWING_RAGE,       30000);
+                            events.ScheduleEvent(EVENT_BELLOWING_RAGE, 30 * IN_MILLISECONDS);
                             break;
                         case EVENT_HOOF_STOMP:
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                                 me->CastSpell(target, SPELL_HOOF_STOMP, false);
-                            events.ScheduleEvent(EVENT_HOOF_STOMP, 15000);
+                            events.ScheduleEvent(EVENT_HOOF_STOMP, 15 * IN_MILLISECONDS);
                             break;
                         case EVENT_RUSHING_CHARGE:
                                 if(Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                                     me->CastSpell(target, SPELL_RUSHING_CHARGE, false);
-                                events.ScheduleEvent(EVENT_RUSHING_CHARGE, 10000);
+                                events.ScheduleEvent(EVENT_RUSHING_CHARGE, 10 * IN_MILLISECONDS);
                                 break;
                         default:
                             break;
@@ -767,20 +716,18 @@ class mob_korda_torros : public CreatureScript
 
 enum eQuilenStonemawSpells
 {
-    SPELL_UNSTABLE_SERUM        =  127373,
+    SPELL_UNSTABLE_SERUM        =  127373
 };
 
 enum eQuilenStonemawEvents
 {
-    EVENT_UNSTABLE_SERUM		= 1,
+    EVENT_UNSTABLE_SERUM        = 1
 };
 
 class mob_quilen_stonemaw : public CreatureScript
 {
     public:
-        mob_quilen_stonemaw() : CreatureScript("mob_quilen_stonemaw")
-        {
-        }
+        mob_quilen_stonemaw() : CreatureScript("mob_quilen_stonemaw") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -789,16 +736,15 @@ class mob_quilen_stonemaw : public CreatureScript
 
         struct mob_quilen_stonemawAI : public ScriptedAI
         {
-            mob_quilen_stonemawAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
+            mob_quilen_stonemawAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
 
             void Reset()
             {
                 events.Reset();
-                events.ScheduleEvent(EVENT_UNSTABLE_SERUM,      5000);
+
+                events.ScheduleEvent(EVENT_UNSTABLE_SERUM, 5 * IN_MILLISECONDS);
             }
 
             void UpdateAI(const uint32 diff)
@@ -818,9 +764,8 @@ class mob_quilen_stonemaw : public CreatureScript
                         case EVENT_UNSTABLE_SERUM:
                             if (Unit* target = me->SelectNearestTarget(5.0f))
                                 me->CastSpell(target, SPELL_UNSTABLE_SERUM, false);
-                            events.ScheduleEvent(EVENT_UNSTABLE_SERUM,      5000);
+                            events.ScheduleEvent(EVENT_UNSTABLE_SERUM, 5 * IN_MILLISECONDS);
                             break;
-
                         default:
                             break;
                     }
@@ -835,22 +780,25 @@ enum eZaiTheOutcastSpells
 {
     SPELL_RAIN_DANCE    = 124860,
     SPELL_TORRENT       = 124935,
-    SPELL_WATER_BOLT    = 124854,
+    SPELL_WATER_BOLT    = 124854
 };
 
 enum eZaiTheOutcastEvents
 {
     EVENT_RAIN_DANCE    = 1,
     EVENT_TORRENT       = 2,
-    EVENT_WATER_BOLT    = 3,
+    EVENT_WATER_BOLT    = 3
+};
+
+enum eZaiTheOutcastCreatures
+{
+    NPC_TORNADO_ZTO     = 64267
 };
 
 class mob_zai_the_outcast : public CreatureScript
 {
     public:
-        mob_zai_the_outcast() : CreatureScript("mob_zai_the_outcast")
-        {
-        }
+        mob_zai_the_outcast() : CreatureScript("mob_zai_the_outcast") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
@@ -859,9 +807,7 @@ class mob_zai_the_outcast : public CreatureScript
 
         struct mob_zai_the_outcastAI : public ScriptedAI
         {
-            mob_zai_the_outcastAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
+            mob_zai_the_outcastAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap events;
 
@@ -869,23 +815,21 @@ class mob_zai_the_outcast : public CreatureScript
             {
                 events.Reset();
 
-                events.ScheduleEvent(EVENT_RAIN_DANCE,       8000);
-                events.ScheduleEvent(EVENT_TORRENT,         40000);
-                events.ScheduleEvent(EVENT_WATER_BOLT,      32000);
+                events.ScheduleEvent(EVENT_RAIN_DANCE, 8 * IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_TORRENT, 40 * IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_WATER_BOLT, 32 * IN_MILLISECONDS);
             }
 
             void EnterCombat(Unit* /*who*/)
             {
-            	Talk(SAY_ZAI_OUTCAST_AGGRO);
+                Talk(SAY_ZAI_OUTCAST_AGGRO);
             }
 
-            void JustDied(Unit* /*killer*/)
-            {
-            }
+            void JustDied(Unit* /*killer*/) { }
 
             void JustSummoned(Creature* summon)
             {
-                if (summon->GetEntry() == 64267)
+                if (summon->GetEntry() == NPC_TORNADO_ZTO)
                 {
                     summon->AddAura(SPELL_TORNADO_DMG, summon);
                     summon->SetReactState(REACT_PASSIVE);
@@ -910,19 +854,18 @@ class mob_zai_the_outcast : public CreatureScript
                         case EVENT_RAIN_DANCE:
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                                 me->CastSpell(target, SPELL_RAIN_DANCE, false);
-                            events.ScheduleEvent(EVENT_RAIN_DANCE,      8000);
+                            events.ScheduleEvent(EVENT_RAIN_DANCE, 8 * IN_MILLISECONDS);
                             break;
                         case EVENT_TORRENT:
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                                 me->CastSpell(target, SPELL_TORRENT, false);
-                            events.ScheduleEvent(EVENT_TORRENT, 40000);
+                            events.ScheduleEvent(EVENT_TORRENT, 40 * IN_MILLISECONDS);
                             break;
                         case EVENT_WATER_BOLT:
                             if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                                 me->CastSpell(target, SPELL_WATER_BOLT, false);
-                            events.ScheduleEvent(EVENT_WATER_BOLT, 32000);
+                            events.ScheduleEvent(EVENT_WATER_BOLT, 32 * IN_MILLISECONDS);
                             break;
-
                         default:
                             break;
                     }
