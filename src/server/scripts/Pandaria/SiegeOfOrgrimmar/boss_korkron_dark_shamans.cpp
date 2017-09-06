@@ -214,17 +214,6 @@ enum Gameobjects
     GOBJECT_IRON_TOMB  = 220864,
 };
 
-static void DespawnCreaturesInArea(uint32 entry, WorldObject* object)
-{
-    std::list<Creature*> creatures;
-    GetCreatureListWithEntryInGrid(creatures, object, entry, 300.0f);
-    if (creatures.empty())
-        return;
-
-    for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
-        (*iter)->DespawnOrUnsummon();
-}
-
 // 71859 - Earthbreaker Haromm
 class boss_earthbreaker_haromm : public CreatureScript
 {
@@ -256,22 +245,6 @@ class boss_earthbreaker_haromm : public CreatureScript
                 _Reset();
                 events.Reset();
                 summons.DespawnAll();
-
-                uint8 Creatures[9] =
-                {
-                    CREATURE_TOXIC_STORM,
-                    CREATURE_TOXIC_TORNADO,
-                    CREATURE_FALLING_ASH,
-                    CREATURE_ASH_ELEMENTAL,
-                    CREATURE_FOUL_SLIME,
-                    CREATURE_FOULSTREAM_TOTEM,
-                    CREATURE_ASHFLARE_TOTEM,
-                    CREATURE_POISONMIST_TOTEM,
-                    CREATURE_RUSTED_IRON_TOTEM,
-                };
-
-                for (int i = 0; i <= 8; i++)
-                    DespawnCreaturesInArea(Creatures[i], me);
 
                 switch (me->GetMap()->GetDifficulty())
                 {
@@ -312,21 +285,7 @@ class boss_earthbreaker_haromm : public CreatureScript
                     m_Instance->SetBossState(DATA_EARTHBREAKER_HAROMM, FAIL);
                 }
 
-                uint8 Creatures[9] =
-                {
-                    CREATURE_TOXIC_STORM,
-                    CREATURE_TOXIC_TORNADO,
-                    CREATURE_FALLING_ASH,
-                    CREATURE_ASH_ELEMENTAL,
-                    CREATURE_FOUL_SLIME,
-                    CREATURE_FOULSTREAM_TOTEM,
-                    CREATURE_ASHFLARE_TOTEM,
-                    CREATURE_POISONMIST_TOTEM,
-                    CREATURE_RUSTED_IRON_TOTEM,
-                };
-
-                for (int i = 0; i <= 8; i++)
-                    DespawnCreaturesInArea(Creatures[i], me);
+                summons.DespawnAll();
 
                 if (Creature* Darkfang = me->FindNearestCreature(CREATURE_DARKFANG, 500.0f, false))
                     if (Creature* Bloodclaw = me->FindNearestCreature(CREATURE_BLOODCLAW, 500.0f, false))
@@ -374,21 +333,7 @@ class boss_earthbreaker_haromm : public CreatureScript
                     m_Instance->SetBossState(DATA_EARTHBREAKER_HAROMM, DONE);
                 }
 
-                uint8 Creatures[9] =
-                {
-                    CREATURE_TOXIC_STORM,
-                    CREATURE_TOXIC_TORNADO,
-                    CREATURE_FALLING_ASH,
-                    CREATURE_ASH_ELEMENTAL,
-                    CREATURE_FOUL_SLIME,
-                    CREATURE_FOULSTREAM_TOTEM,
-                    CREATURE_ASHFLARE_TOTEM,
-                    CREATURE_POISONMIST_TOTEM,
-                    CREATURE_RUSTED_IRON_TOTEM,
-                };
-
-                for (int i = 0; i <= 8; i++)
-                    DespawnCreaturesInArea(Creatures[i], me);
+                summons.DespawnAll();
             }
 
             void UpdateAI(uint32 const diff) override
@@ -633,22 +578,6 @@ class boss_wavebinder_kardris : public CreatureScript
                 events.Reset();
                 summons.DespawnAll();
 
-                uint8 Creatures[9] =
-                {
-                    CREATURE_TOXIC_STORM,
-                    CREATURE_TOXIC_TORNADO,
-                    CREATURE_FALLING_ASH,
-                    CREATURE_ASH_ELEMENTAL,
-                    CREATURE_FOUL_SLIME,
-                    CREATURE_FOULSTREAM_TOTEM,
-                    CREATURE_ASHFLARE_TOTEM,
-                    CREATURE_POISONMIST_TOTEM,
-                    CREATURE_RUSTED_IRON_TOTEM,
-                };
-
-                for (int i = 0; i <= 8; i++)
-                    DespawnCreaturesInArea(Creatures[i], me);
-
                 switch (me->GetMap()->GetDifficulty())
                 {
                     case RAID_DIFFICULTY_10MAN_NORMAL:
@@ -688,21 +617,7 @@ class boss_wavebinder_kardris : public CreatureScript
                     m_Instance->SetBossState(DATA_WAVEBINDER_KARDRIS, FAIL);
                 }
 
-                uint8 Creatures[9] =
-                {
-                    CREATURE_TOXIC_STORM,
-                    CREATURE_TOXIC_TORNADO,
-                    CREATURE_FALLING_ASH,
-                    CREATURE_ASH_ELEMENTAL,
-                    CREATURE_FOUL_SLIME,
-                    CREATURE_FOULSTREAM_TOTEM,
-                    CREATURE_ASHFLARE_TOTEM,
-                    CREATURE_POISONMIST_TOTEM,
-                    CREATURE_RUSTED_IRON_TOTEM,
-                };
-
-                for (int i = 0; i <= 8; i++)
-                    DespawnCreaturesInArea(Creatures[i], me);
+                summons.DespawnAll();
 
                 if (Creature* Darkfang = me->FindNearestCreature(CREATURE_DARKFANG, 500.0f, false))
                     if (Creature* Bloodclaw = me->FindNearestCreature(CREATURE_BLOODCLAW, 500.0f, false))
@@ -746,21 +661,7 @@ class boss_wavebinder_kardris : public CreatureScript
                     m_Instance->SetBossState(DATA_WAVEBINDER_KARDRIS, DONE);
                 }
 
-                uint8 Creatures[9] =
-                {
-                    CREATURE_TOXIC_STORM,
-                    CREATURE_TOXIC_TORNADO,
-                    CREATURE_FALLING_ASH,
-                    CREATURE_ASH_ELEMENTAL,
-                    CREATURE_FOUL_SLIME,
-                    CREATURE_FOULSTREAM_TOTEM,
-                    CREATURE_ASHFLARE_TOTEM,
-                    CREATURE_POISONMIST_TOTEM,
-                    CREATURE_RUSTED_IRON_TOTEM,
-                };
-
-                for (int i = 0; i <= 8; i++)
-                    DespawnCreaturesInArea(Creatures[i], me);
+                summons.DespawnAll();
             }
 
             void UpdateAI(uint32 const diff) override

@@ -79,24 +79,6 @@ enum Talk
 
 const Position centerPos = { 1914.38f, -4950.57f, -198.96f, 3.77f };
 
-uint8 creaturesToDespawn[MAX_CREATURES] =
-{
-    CREATURE_ARCING_SMASH,
-    CREATURE_ANCIENT_MIASMA,
-    CREATURE_IMPLOSION
-};
-
-static void DespawnCreaturesInArea(uint32 entry, WorldObject* object)
-{
-    std::list<Creature*> creatures;
-    GetCreatureListWithEntryInGrid(creatures, object, entry, 300.0f);
-    if (creatures.empty())
-        return;
-
-    for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
-        (*iter)->DespawnOrUnsummon();
-}
-
 class boss_malkorok : public CreatureScript
 {
     public:
@@ -137,18 +119,12 @@ class boss_malkorok : public CreatureScript
 
                 events.Reset();
                 events.SetPhase(PHASE_ONE);
-
-                for (uint8 i = 0; i < Creatures::MAX_CREATURES; ++i)
-                    DespawnCreaturesInArea(creaturesToDespawn[i], me);
             }
 
             void JustDied(Unit* /*killer*/) override
             {
                 _JustDied();
                 Talk(MALKOROK_DEATH);
-                
-                for (uint8 i = 0; i < Creatures::MAX_CREATURES; ++i)
-                    DespawnCreaturesInArea(creaturesToDespawn[i], me);
             }
             
             void MovementInform(uint32 type, uint32 id) override
@@ -307,8 +283,9 @@ class boss_malkorok : public CreatureScript
 
                         events.SetPhase(PHASE_TWO);
                         SetPhase(PHASE_TWO);
-                        DespawnCreaturesInArea(CREATURE_ANCIENT_MIASMA, me);
 
+                        if (Creature* ancientMiasma = GetClosestCreatureWithEntry(me, CREATURE_ANCIENT_MIASMA, 50.0f))
+                            ancientMiasma->ForcedDespawn(0);
                         me->SetPower(Powers::POWER_RAGE, 0);
                         DoCast(me, SPELL_BLOOD_RAGE);
                         events.ScheduleEvent(EVENT_PHASE_ONE, 20000, 0, PHASE_TWO);
