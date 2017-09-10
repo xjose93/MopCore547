@@ -73,6 +73,7 @@ find_package(PCHSupport)
 find_package(ACE REQUIRED)
 find_package(MySQL REQUIRED)
 find_package(OpenSSL REQUIRED)
+find_package(Git)
 
 # Find revision ID and hash of the sourcetree
 include(cmake/genrev.cmake)
