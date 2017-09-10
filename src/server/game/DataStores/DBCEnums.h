@@ -172,7 +172,7 @@ enum AchievementCriteriaTimedTypes
     ACHIEVEMENT_TIMED_TYPE_SPELL_TARGET     = 6,    // Timer is started by being target of spell with entry in timerStartEvent
     ACHIEVEMENT_TIMED_TYPE_CREATURE         = 7,    // Timer is started by killing creature with entry in timerStartEvent
     ACHIEVEMENT_TIMED_TYPE_ITEM             = 9,    // Timer is started by using item with entry in timerStartEvent
-    ACHIEVEMENT_TIMED_TYPE_UNK              = 10,   // Unknown
+    ACHIEVEMENT_TIMED_TYPE_UNK              = 14,   // Unknown
 
     ACHIEVEMENT_TIMED_TYPE_MAX
 };
@@ -308,7 +308,7 @@ enum AchievementCriteriaTypes
     ACHIEVEMENT_CRITERIA_TYPE_UNK149                        = 149, // achievement 6267 other fields = 0
     ACHIEVEMENT_CRITERIA_TYPE_UNK150                        = 150, // achievement 6271 other fields = 0
     // 0..150 => 151 criteria types total
-    ACHIEVEMENT_CRITERIA_TYPE_TOTAL                         = 151
+    ACHIEVEMENT_CRITERIA_TYPE_TOTAL                         = 163
 };
 
 enum AreaFlags
@@ -397,7 +397,7 @@ enum SpawnMask
     SPAWNMASK_RAID_HEROIC_ALL       = (SPAWNMASK_RAID_10MAN_HEROIC | SPAWNMASK_RAID_25MAN_HEROIC),
 
     SPAWNMASK_RAID_ALL              = (SPAWNMASK_RAID_NORMAL_ALL | SPAWNMASK_RAID_HEROIC_ALL),
-    
+
     SPAWNMASK_SCENARIO_NORMAL       = (1 << SCENARIO_DIFFICULTY_NORMAL),
     SPAWNMASK_SCENARIO_HEROIC       = (1 << SCENARIO_DIFFICULTY_HEROIC),
     SPAWNMASK_SCENARIO_ALL          = (SCENARIO_DIFFICULTY_NORMAL | SCENARIO_DIFFICULTY_HEROIC)

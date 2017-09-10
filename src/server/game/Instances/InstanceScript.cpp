@@ -25,9 +25,14 @@
 #include "CreatureAI.h"
 #include "Log.h"
 #include "LFGMgr.h"
+#include "InstanceScenario.h"
 
 void InstanceScript::SaveToDB()
 {
+    if (InstanceMap* instanceMap = dynamic_cast<InstanceMap*>(instance))
+        if (InstanceScenario* scenario = instanceMap->GetInstanceScenario())
+            scenario->SaveToDB();
+
     std::string data = GetSaveData();
     if (data.empty())
         return;
@@ -499,7 +504,7 @@ void InstanceScript::DoStartMovie(uint32 movieId)
 void InstanceScript::DoKilledMonsterKredit(uint32 questId, uint32 entry, uint64 guid/* =0*/)
 {
     Map::PlayerList const &plrList = instance->GetPlayers();
-    
+
     if (!plrList.isEmpty())
         for (Map::PlayerList::const_iterator i = plrList.begin(); i != plrList.end(); ++i)
             if (Player* pPlayer = i->getSource())

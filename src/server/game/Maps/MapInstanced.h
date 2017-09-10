@@ -64,7 +64,7 @@ class MapInstanced : public Map
         virtual void InitVisibilityDistance();
 
     private:
-        InstanceMap* CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty);
+        InstanceMap* CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty, TeamId team);
         BattlegroundMap* CreateBattleground(uint32 InstanceId, Battleground* bg);
 
         InstancedMaps m_InstancedMaps;

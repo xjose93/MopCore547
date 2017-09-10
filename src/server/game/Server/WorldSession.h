@@ -518,7 +518,7 @@ class WorldSession
         void HandleMoveHoverAck(WorldPacket& recvData);
 
         void HandleMountSpecialAnimOpcode(WorldPacket& recvdata);
-        
+
         void HandleClientReportError(WorldPacket& recvData);
 
         // character view
@@ -674,9 +674,10 @@ class WorldSession
         void HandleSwapRanks(WorldPacket& recvPacket);
         void HandleGuildSetRankPermissionsOpcode(WorldPacket& recvPacket);
         void HandleGuildAddRankOpcode(WorldPacket& recvPacket);
-        void HandleGuildDelRankOpcode(WorldPacket& recvPacket); 
+        void HandleGuildDelRankOpcode(WorldPacket& recvPacket);
         void HandleGuildChangeInfoTextOpcode(WorldPacket& recvPacket);
         void HandleSaveGuildEmblemOpcode(WorldPacket& recvPacket);
+        void HandleScenarioQueryOpcode(WorldPacket& recvPacket);
         void HandleGuildRequestPartyState(WorldPacket& recvPacket);
 		void HandleGuildRequestMaxDailyXP(WorldPacket& recvPacket);
         void HandleAutoDeclineGuildInvites(WorldPacket& recvPacket);
@@ -956,7 +957,7 @@ class WorldSession
         void HandleSelfResOpcode(WorldPacket& recvData);
         void HandleComplainOpcode(WorldPacket& recvData);
         void HandleRequestPetInfoOpcode(WorldPacket& recvData);
-        
+
         // Shop
         void HandleShopDataRequest(WorldPacket& recvData);
 

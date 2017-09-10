@@ -34,6 +34,7 @@
 #include "World.h"
 #include "Group.h"
 #include "InstanceScript.h"
+#include "InstanceScenario.h"
 
 uint16 InstanceSaveManager::ResetTimeDelay[] = {3600, 900, 300, 60};
 
@@ -125,6 +126,12 @@ void InstanceSaveManager::DeleteInstanceFromDB(uint32 instanceid)
     CharacterDatabase.PQuery("DELETE FROM instance WHERE id = '%u'", instanceid);
     CharacterDatabase.PQuery("DELETE FROM character_instance WHERE instance = '%u'", instanceid);
     CharacterDatabase.PQuery("DELETE FROM group_instance WHERE instance = '%u'", instanceid);
+
+    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_SCENARIO_INSTANCE_CRITERIA_FOR_INSTANCE);
+    stmt->setUInt32(0, instanceid);
+    trans->Append(stmt);
+    CharacterDatabase.CommitTransaction(trans);
     // Respawn times should be deleted only when the map gets unloaded
 }
 
@@ -182,6 +189,10 @@ void InstanceSave::SaveToDB()
             data = instanceScript->GetSaveData();
             completedEncounters = instanceScript->GetCompletedEncounterMask();
         }
+
+        if (InstanceMap* instanceMap = dynamic_cast<InstanceMap*>(map))
+            if (InstanceScenario* scenario = instanceMap->GetInstanceScenario())
+                scenario->SaveToDB();
     }
 
     CharacterDatabase.PQuery("INSERT INTO instance (id, map, resettime, difficulty, completedEncounters, data) VALUES ('%u', '%u', '%u', '%u', '%u', '%s')",

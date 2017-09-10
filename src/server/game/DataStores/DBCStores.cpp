@@ -83,6 +83,8 @@ DBCStorage <CreatureFamilyEntry>          sCreatureFamilyStore(CreatureFamilyfmt
 DBCStorage <CreatureModelDataEntry>       sCreatureModelDataStore(CreatureModelDatafmt);
 DBCStorage <CreatureSpellDataEntry>       sCreatureSpellDataStore(CreatureSpellDatafmt);
 DBCStorage <CreatureTypeEntry>            sCreatureTypeStore(CreatureTypefmt);
+DBCStorage <CriteriaEntry>                sCriteriaStore(Criteriafmt);
+DBCStorage <CriteriaTreeEntry>            sCriteriaTreeStore(CriteriaTreefmt);
 DBCStorage <CurrencyTypesEntry>           sCurrencyTypesStore(CurrencyTypesfmt);
 
 DBCStorage <DestructibleModelDataEntry>   sDestructibleModelDataStore(DestructibleModelDatafmt);
@@ -158,6 +160,7 @@ DBCStorage <MapEntry>                    sMapStore(MapEntryfmt);
 DBCStorage <MapDifficultyEntry>          sMapDifficultyStore(MapDifficultyEntryfmt); // Only for loading
 MapDifficultyMap                         sMapDifficultyMap;
 
+DBCStorage <ModifierTreeEntry>           sModifierTreeStore(ModifierTreefmt);
 DBCStorage <MovieEntry>                  sMovieStore(MovieEntryfmt);
 DBCStorage <MountCapabilityEntry>        sMountCapabilityStore(MountCapabilityfmt);
 DBCStorage <MountTypeEntry>              sMountTypeStore(MountTypefmt);
@@ -184,6 +187,10 @@ std::set<ResearchProjectEntry const*> sResearchProjectSet;
 
 DBCStorage <ScalingStatDistributionEntry> sScalingStatDistributionStore(ScalingStatDistributionfmt);
 DBCStorage <ScalingStatValuesEntry>      sScalingStatValuesStore(ScalingStatValuesfmt);
+
+DBCStorage<ScenarioEntry>                sScenarioStore(ScenarioEntryfmt);
+DBCStorage<ScenarioEventEntry>           sScenarioEventEntryStore(ScenarioEventEntryfmt);
+DBCStorage<ScenarioStepEntry>            sScenarioStepStore(ScenarioStepEntryfmt);
 
 DBCStorage <SkillLineEntry>              sSkillLineStore(SkillLinefmt);
 DBCStorage <SkillLineAbilityEntry>       sSkillLineAbilityStore(SkillLineAbilityfmt);
@@ -386,6 +393,8 @@ void LoadDBCStores(const std::string& dataPath)
     LoadDBC(availableDbcLocales, bad_dbc_files, sCreatureModelDataStore,      dbcPath, "CreatureModelData.dbc");                                            // 17399
     LoadDBC(availableDbcLocales, bad_dbc_files, sCreatureSpellDataStore,      dbcPath, "CreatureSpellData.dbc");                                            // 17399
     LoadDBC(availableDbcLocales, bad_dbc_files, sCreatureTypeStore,           dbcPath, "CreatureType.dbc");                                                 // 17399
+    LoadDBC(availableDbcLocales, bad_dbc_files, sCriteriaStore,               dbcPath, "Criteria.dbc");                                                     // 18414
+    LoadDBC(availableDbcLocales, bad_dbc_files, sCriteriaTreeStore,           dbcPath, "CriteriaTree.dbc");                                                 // 18414
     LoadDBC(availableDbcLocales, bad_dbc_files, sCurrencyTypesStore,          dbcPath, "CurrencyTypes.dbc");                                                // 17399
     LoadDBC(availableDbcLocales, bad_dbc_files, sDestructibleModelDataStore,  dbcPath, "DestructibleModelData.dbc");                                        // 17399
     LoadDBC(availableDbcLocales, bad_dbc_files, sDungeonEncounterStore,       dbcPath, "DungeonEncounter.dbc");                                             // 17399
@@ -491,6 +500,7 @@ void LoadDBCStores(const std::string& dataPath)
             sGenNameVectoArraysMap[entry->race].stringVectorArray[entry->gender].push_back(std::string(entry->name));
     sNameGenStore.Clear();
 
+    LoadDBC(availableDbcLocales, bad_dbc_files, sModifierTreeStore,           dbcPath, "ModifierTree.dbc");                                                 // 18414
     LoadDBC(availableDbcLocales, bad_dbc_files, sMovieStore,                  dbcPath, "Movie.dbc");                                                        // 17399
 
     LoadDBC(availableDbcLocales, bad_dbc_files, sOverrideSpellDataStore,      dbcPath, "OverrideSpellData.dbc");                                            // 17399
@@ -546,6 +556,9 @@ void LoadDBCStores(const std::string& dataPath)
 
     LoadDBC(availableDbcLocales, bad_dbc_files, sScalingStatDistributionStore,dbcPath, "ScalingStatDistribution.dbc");                                      // 17399
     LoadDBC(availableDbcLocales, bad_dbc_files, sScalingStatValuesStore,      dbcPath, "ScalingStatValues.dbc");                                            // 17399
+    LoadDBC(availableDbcLocales, bad_dbc_files, sScenarioStore,               dbcPath, "Scenario.dbc");
+    LoadDBC(availableDbcLocales, bad_dbc_files, sScenarioEventEntryStore,     dbcPath, "ScenarioEventEntry.dbc");
+    LoadDBC(availableDbcLocales, bad_dbc_files, sScenarioStepStore,           dbcPath, "ScenarioStep.dbc");
     LoadDBC(availableDbcLocales, bad_dbc_files, sSkillLineStore,              dbcPath, "SkillLine.dbc");                                                    // 17399
     LoadDBC(availableDbcLocales, bad_dbc_files, sSkillLineAbilityStore,       dbcPath, "SkillLineAbility.dbc");                                             // 17399
     LoadDBC(availableDbcLocales, bad_dbc_files, sSoundEntriesStore,           dbcPath, "SoundEntries.dbc");                                                 // 17399

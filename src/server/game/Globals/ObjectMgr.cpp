@@ -5338,7 +5338,7 @@ void ObjectMgr::LoadNpcTextLocales()
 
     _npcTextLocaleStore.clear();                              // need for reload case
 
-    QueryResult result = WorldDatabase.Query("SELECT entry, " 
+    QueryResult result = WorldDatabase.Query("SELECT entry, "
         "Text0_0_loc1,  Text0_1_loc1,  Text1_0_loc1,  Text1_1_loc1,  Text2_0_loc1,  Text2_1_loc1,  Text3_0_loc1,  Text3_1_loc1,  Text4_0_loc1,  Text4_1_loc1,  Text5_0_loc1,  Text5_1_loc1,  Text6_0_loc1,  Text6_1_loc1,  Text7_0_loc1,  Text7_1_loc1,  Text8_0_loc1,   Text8_1_loc1,   Text9_0_loc1,   Text9_1_loc1, "
         "Text0_0_loc2,  Text0_1_loc2,  Text1_0_loc2,  Text1_1_loc2,  Text2_0_loc2,  Text2_1_loc2,  Text3_0_loc2,  Text3_1_loc1,  Text4_0_loc2,  Text4_1_loc2,  Text5_0_loc2,  Text5_1_loc2,  Text6_0_loc2,  Text6_1_loc2,  Text7_0_loc2,  Text7_1_loc2,  Text8_0_loc2,   Text8_1_loc2,   Text9_0_loc2,   Text9_1_loc2, "
         "Text0_0_loc3,  Text0_1_loc3,  Text1_0_loc3,  Text1_1_loc3,  Text2_0_loc3,  Text2_1_loc3,  Text3_0_loc3,  Text3_1_loc1,  Text4_0_loc3,  Text4_1_loc3,  Text5_0_loc3,  Text5_1_loc3,  Text6_0_loc3,  Text6_1_loc3,  Text7_0_loc3,  Text7_1_loc3,  Text8_0_loc3,   Text8_1_loc3,   Text9_0_loc3,   Text9_1_loc3, "
@@ -5781,7 +5781,7 @@ void ObjectMgr::LoadGraveyardZones()
         }
 
         if (areaEntry->zone != 0 && zoneId != 33 && zoneId != 4755 && zoneId != 5287 && zoneId != 6170 && zoneId != 6176 && zoneId != 6450 && zoneId != 6451
-                             && zoneId != 6452 && zoneId != 6453 && zoneId != 6454 && zoneId != 6455 && zoneId != 6456 && zoneId != 6450) 
+                             && zoneId != 6452 && zoneId != 6453 && zoneId != 6454 && zoneId != 6455 && zoneId != 6456 && zoneId != 6450)
         {
             sLog->outError(LOG_FILTER_SQL, "Table `game_graveyard_zone` has a record for subzone id (%u) instead of zone, skipped.", zoneId);
             continue;
@@ -9123,6 +9123,83 @@ void ObjectMgr::LoadSpellPhaseInfo()
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u spell dbc infos in %u ms.", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
+void ObjectMgr::LoadScenarioPOI()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _scenarioPOIStore.clear(); // need for reload case
+
+    uint32 count = 0;
+
+    //                                                      0            1        2     6          7           8       9       10         11               12
+    QueryResult result = WorldDatabase.Query("SELECT CriteriaTreeID, BlobIndex, Idx1, MapID, WorldMapAreaId, Floor, Priority, Flags, WorldEffectID, PlayerConditionID FROM scenario_poi order by CriteriaTreeID, Idx1");
+    if (!result)
+    {
+        sLog->outError(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 scenario POI definitions. DB table `scenario_poi` is empty.");
+        return;
+    }
+
+    //                                                0        1    2  3
+    QueryResult points = WorldDatabase.Query("SELECT CriteriaTreeID, Idx1, X, Y FROM scenario_poi_points ORDER BY CriteriaTreeID DESC, Idx1, Idx2");
+
+    std::vector<std::vector<std::vector<ScenarioPOIPoint>>> POIs;
+
+    if (points)
+    {
+        // The first result should have the highest criteriaTreeId
+        Field* fields = points->Fetch();
+        uint32 criteriaTreeIdMax = fields[0].GetInt32();
+        POIs.resize(criteriaTreeIdMax + 1);
+
+        do
+        {
+            fields = points->Fetch();
+
+            int32 CriteriaTreeID = fields[0].GetInt32();
+            int32 Idx1 = fields[1].GetInt32();
+            int32 X = fields[2].GetInt32();
+            int32 Y = fields[3].GetInt32();
+
+            if (int32(POIs[CriteriaTreeID].size()) <= Idx1 + 1)
+                POIs[CriteriaTreeID].resize(Idx1 + 10);
+
+            ScenarioPOIPoint point(X, Y);
+            POIs[CriteriaTreeID][Idx1].push_back(point);
+        } while (points->NextRow());
+    }
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        int32 CriteriaTreeID = fields[0].GetInt32();
+        int32 BlobIndex = fields[1].GetInt32();
+        int32 Idx1 = fields[2].GetInt32();
+        int32 MapID = fields[3].GetInt32();
+        int32 WorldMapAreaId = fields[4].GetInt32();
+        int32 Floor = fields[5].GetInt32();
+        int32 Priority = fields[6].GetInt32();
+        int32 Flags = fields[7].GetInt32();
+        int32 WorldEffectID = fields[8].GetInt32();
+        int32 PlayerConditionID = fields[9].GetInt32();
+
+        if (!sCriteriaMgr->GetCriteriaTree(CriteriaTreeID))
+            sLog->outError(LOG_FILTER_SQL, "`scenario_poi` CriteriaTreeID (%u) Idx1 (%u) does not correspond to a valid criteria tree", CriteriaTreeID, Idx1);
+
+        ScenarioPOI* POI = new ScenarioPOI(BlobIndex, MapID, WorldMapAreaId, Floor, Priority, Flags, WorldEffectID, PlayerConditionID);
+        if (CriteriaTreeID < int32(POIs.size()) && Idx1 < int32(POIs[CriteriaTreeID].size()))
+        {
+            POI->Points = POIs[CriteriaTreeID][Idx1];
+            _scenarioPOIStore[CriteriaTreeID].push_back(POI);
+        }
+        else
+            sLog->outError(LOG_FILTER_SERVER_LOADING, "Table scenario_poi references unknown scenario poi points for criteria tree id %i POI id %i", CriteriaTreeID, BlobIndex);
+
+        ++count;
+    } while (result->NextRow());
+
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u scenario POI definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
 
 GameObjectTemplate const* ObjectMgr::GetGameObjectTemplate(uint32 entry)
 {
@@ -9431,46 +9508,46 @@ void ObjectMgr::RestructGameObjectGUID(uint32 nbLigneToRestruct)
 void ObjectMgr::LoadItemExtendedCost()
 {
     QueryResult result = WorldDatabase.PQuery("SELECT ID, RequiredArenaSlot, RequiredItem1, RequiredItem2, RequiredItem3, RequiredItem4, RequiredItem5, RequiredItemCount1, RequiredItemCount2, RequiredItemCount3, RequiredItemCount4, RequiredItemCount5,RequiredPersonalArenaRating, RequiredCurrency1, RequiredCurrency2, RequiredCurrency3, RequiredCurrency4, RequiredCurrency5, RequiredCurrencyCount1, RequiredCurrencyCount2, RequiredCurrencyCount3, RequiredCurrencyCount4, RequiredCurrencyCount5 FROM item_extended_cost");
-    
+
     if (!result)
     {
         sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 item extended cost info. DB table `item_extended_cost` is empty.");
         return;
     }
-    
+
     uint32 counter = 0;
-    
+
     do
     {
         Field* field = result->Fetch();
         int index = 0;
         counter++;
-        
+
         ItemExtendedCostEntry* extendedCost = new ItemExtendedCostEntry();
         extendedCost->ID = field[index++].GetUInt32();
         extendedCost->RequiredArenaSlot = field[index++].GetUInt32();
-        
+
         for (uint32 i = 0; i < MAX_ITEM_EXT_COST_ITEMS; i++)
             extendedCost->RequiredItem[i] = field[index++].GetUInt32();
-        
+
         for (uint32 i = 0; i < MAX_ITEM_EXT_COST_ITEMS; i++)
             extendedCost->RequiredItemCount[i] = field[index++].GetUInt32();
-        
+
         extendedCost->RequiredPersonalArenaRating = field[index++].GetUInt32();
-        
+
         for (uint32 i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; i++)
             extendedCost->RequiredCurrency[i] = field[index++].GetUInt32();
-        
+
         for (uint32 i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; i++)
             extendedCost->RequiredCurrencyCount[i] = field[index++].GetUInt32();
-        
+
         sItemExtendedCostStore.EraseEntry(extendedCost->ID);
         sItemExtendedCostStore.AddEntry(extendedCost->ID, (const ItemExtendedCostEntry*)extendedCost);
         _overwriteExtendedCosts.insert(extendedCost->ID);
-        
+
     }
     while (result->NextRow());
-    
+
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u item extended cost info.", counter);
 }
 

@@ -33,6 +33,7 @@
 #include "LFGMgr.h"
 #include "DynamicTree.h"
 #include "Vehicle.h"
+#include "InstanceScenario.h"
 
 union u_map_magic
 {
@@ -1512,7 +1513,7 @@ inline GridMap* Map::GetGrid(float x, float y)
     // half opt method
     int gx=(int)(32-x/SIZE_OF_GRIDS);                       //grid x
     int gy=(int)(32-y/SIZE_OF_GRIDS);                       //grid y
- 
+
     if (gx >= MAX_NUMBER_OF_GRIDS || gy >= MAX_NUMBER_OF_GRIDS ||
         gx < 0 || gy < 0)
         return NULL;
@@ -1589,7 +1590,7 @@ float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float
             return VMAP_INVALID_HEIGHT_VALUE;               // we not have any height
     }
 
-   //return mapHeight; 
+   //return mapHeight;
 }
 
 inline bool IsOutdoorWMO(uint32 mogpFlags, int32 /*adtId*/, int32 /*rootId*/, int32 /*groupId*/, WMOAreaTableEntry const* wmoEntry, AreaTableEntry const* atEntry)
@@ -2230,7 +2231,7 @@ template void Map::RemoveFromMap(AreaTrigger*, bool);
 InstanceMap::InstanceMap(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, Map* _parent)
   : Map(id, expiry, InstanceId, SpawnMode, _parent),
     m_resetAfterUnload(false), m_unloadWhenEmpty(false),
-    i_data(NULL), i_script_id(0)
+    i_data(NULL), i_script_id(0), i_scenario(nullptr)
 {
     //lets initialize visibility distance for dungeons
     InstanceMap::InitVisibilityDistance();
@@ -2446,6 +2447,9 @@ bool InstanceMap::AddPlayerToMap(Player* player)
     if (i_data)
         i_data->OnPlayerEnter(player);
 
+    if (i_scenario)
+        i_scenario->OnPlayerEnter(player);
+
     return true;
 }
 
@@ -2455,6 +2459,9 @@ void InstanceMap::Update(const uint32 t_diff)
 
     if (i_data)
         i_data->Update(t_diff);
+
+    if (i_scenario)
+        i_scenario->Update(t_diff);
 }
 
 void InstanceMap::RemovePlayerFromMap(Player* player, bool remove)
@@ -2463,6 +2470,8 @@ void InstanceMap::RemovePlayerFromMap(Player* player, bool remove)
     //if last player set unload timer
     if (!m_unloadTimer && m_mapRefManager.getSize() == 1)
         m_unloadTimer = m_unloadWhenEmpty ? MIN_UNLOAD_DELAY : std::max(sWorld->getIntConfig(CONFIG_INSTANCE_UNLOAD_DELAY), (uint32)MIN_UNLOAD_DELAY);
+    if (i_scenario)
+        i_scenario->OnPlayerExit(player);
     Map::RemovePlayerFromMap(player, remove);
     // for normal instances schedule the reset after all players have left
     SetResetSchedule(true);

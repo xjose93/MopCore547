@@ -24,6 +24,7 @@
 #include "InstanceSaveMgr.h"
 #include "World.h"
 #include "Group.h"
+#include "ScenarioMgr.h"
 
 MapInstanced::MapInstanced(uint32 id, time_t expiry) : Map(id, expiry, 0, DUNGEON_DIFFICULTY_NORMAL)
 {
@@ -170,7 +171,7 @@ Map* MapInstanced::CreateInstanceForPlayer(const uint32 mapId, Player* player)
                 {
                     // Dynamic Difficulty lock: create an instance that matches the difficulty the player changes to.
                     if (player->GetDifficulty(IsRaid()) != pSave->GetDifficulty() || map && map->GetSpawnMode() != player->GetDifficulty(IsRaid()))
-                        map = CreateInstance(newInstanceId, pSave, player->GetDifficulty(IsRaid()));
+                        map = CreateInstance(newInstanceId, pSave, player->GetDifficulty(IsRaid()), player->GetTeamId());
                 }
                 else
                 {
@@ -182,7 +183,7 @@ Map* MapInstanced::CreateInstanceForPlayer(const uint32 mapId, Player* player)
                     {
                         // Normal. The map is created on the player difficulty.
                         if (player->GetDifficulty(IsRaid()) != pSave->GetDifficulty() || map && map->GetSpawnMode() != player->GetDifficulty(IsRaid()))
-                            map = CreateInstance(newInstanceId, pSave, player->GetDifficulty(IsRaid()));
+                            map = CreateInstance(newInstanceId, pSave, player->GetDifficulty(IsRaid()), player->GetTeamId());
                     }
                 }
             }
@@ -207,7 +208,7 @@ Map* MapInstanced::CreateInstanceForPlayer(const uint32 mapId, Player* player)
     return map;
 }
 
-InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty)
+InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty, TeamId team)
 {
     // load/create a map
     TRINITY_GUARD(ACE_Thread_Mutex, Lock);
@@ -244,6 +245,8 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save,
 
     bool load_data = save != NULL;
     map->CreateInstanceData(load_data);
+    if (InstanceScenario* instanceScenario = sScenarioMgr->CreateInstanceScenario(map, team))
+        map->SetInstanceScenario(instanceScenario);
 
     m_InstancedMaps[InstanceId] = map;
     return map;

@@ -84,6 +84,7 @@
 #include "UpdateFieldFlags.h"
 #include "LootMgr.h"
 #include "GameObjectAI.h"
+#include "InstanceScenario.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
@@ -478,6 +479,7 @@ void TradeData::SetAccepted(bool state, bool crosssend /*= false*/)
 // 4.4. Give kill credit (player must not be in group, or he must be alive or without corpse).
 // 5. Credit instance encounter.
 // 6. Update guild achievements.
+// 7. Scenario credit
 KillRewarder::KillRewarder(Player* killer, Unit* victim, bool isBattleGround) :
     // 1. Initialize internal variables to default values.
     _killer(killer), _victim(victim), _group(killer->GetGroup()),
@@ -583,7 +585,7 @@ inline void KillRewarder::_RewardXP(Player* player, float rate)
         // 4.2.4. Give XP to player.
         player->GiveXP(xp, _victim, _groupRate);
         // 4.2.5. If player has pet, reward pet with XP (100% for single player, 50% for group case).
-        if (Pet* pet = player->GetPet()) 
+        if (Pet* pet = player->GetPet())
             pet->GivePetXP(_group ? xp / 2 : xp);
     }
 }
@@ -685,6 +687,7 @@ void KillRewarder::Reward()
 
     // 5. Credit instance encounter.
     // 6. Update guild achievements.
+    // 7. Credit scenario criterias
     if (Creature* victim = _victim->ToCreature())
     {
         if (victim->IsDungeonBoss())
@@ -694,6 +697,10 @@ void KillRewarder::Reward()
         if (uint32 guildId = victim->GetMap()->GetOwnerGuildId())
             if (Guild* guild = sGuildMgr->GetGuildById(guildId))
                 guild->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, victim->GetEntry(), 1, 0, victim, _killer);
+
+        if (InstanceMap* instanceMap = victim->GetMap()->ToInstanceMap())
+            if (InstanceScenario* scenario = instanceMap->GetInstanceScenario())
+                scenario->UpdateCriteria(CRITERIA_TYPE_KILL_CREATURE, victim->GetEntry(), 1, 0, victim, _killer);
     }
 
 }
@@ -975,7 +982,7 @@ Player::Player(WorldSession* session): Unit(true), m_achievementMgr(this), m_rep
     m_knockBackTimer = 0;
 
     m_ignoreMovementCount = 0;
-	
+
 	greenGuid = 0;
 	purpleGuid = 0;
 
@@ -1529,7 +1536,7 @@ void Player::SendMirrorTimer(MirrorTimerType Type, uint32 MaxValue, uint32 Curre
     data << uint32(0); // spell id
     data << CurrentValue;
     data << uint32(Regen);
-    data << uint32(Type);                                    
+    data << uint32(Type);
     data.WriteBit(0);
     GetSession()->SendPacket(&data);
 }
@@ -1579,7 +1586,7 @@ uint32 Player::EnvironmentalDamage(EnviromentalDamage type, uint32 damage)
     data << uint32(absorb);
     data << uint8(type != DAMAGE_FALL_TO_VOID ? type : DAMAGE_FALL);
     data << uint32(damage);
-    
+
     data.WriteBit(playerGuid[5]);
     data.WriteBit(playerGuid[4]);
     data.WriteBit(playerGuid[2]);
@@ -1678,7 +1685,7 @@ void Player::HandleDrowning(uint32 time_diff)
             default:
                 break;
         }
-        
+
         // Breath timer not activated - activate it
         if (m_MirrorTimer[BREATH_TIMER] == DISABLED_MIRROR_TIMER)
         {
@@ -1725,7 +1732,7 @@ void Player::HandleDrowning(uint32 time_diff)
             case 5042:
             case 4922:
 			case 5785: // The Jade Forest - Timeless Isle
-			case 5841: // Kun-Lai Summit - Isle of Giants 
+			case 5841: // Kun-Lai Summit - Isle of Giants
                 return;
             default:
                 break;
@@ -2428,7 +2435,7 @@ bool Player::BuildEnumData(PreparedQueryResult result, ByteBuffer* dataBuffer, B
     uint32 atLoginFlags = fields[15].GetUInt16();
     Tokenizer equipment(fields[19].GetString(), ' ');
     uint8 slot = fields[21].GetUInt8();
-           
+
     uint32 charFlags = 0;
     if (playerFlags & PLAYER_FLAGS_HIDE_HELM)
         charFlags |= CHARACTER_FLAG_HIDE_HELM;
@@ -2503,25 +2510,25 @@ bool Player::BuildEnumData(PreparedQueryResult result, ByteBuffer* dataBuffer, B
     dataBuffer->WriteByteSeq(guid[5]);
     dataBuffer->WriteByteSeq(guildGuid[2]);
     dataBuffer->WriteByteSeq(guid[6]);
-   
+
     *dataBuffer << uint32(charFlags);                           // Character flags
     *dataBuffer << uint32(zone);                                // Zone id
-    
+
     dataBuffer->WriteByteSeq(guildGuid[3]);
-    
+
     *dataBuffer << uint32(petLevel);                            // Pet level
     *dataBuffer << uint32(petDisplayId);                        // Pet DisplayID
     *dataBuffer << uint32(0);                                   // UNK00 new field - Boost field
-    *dataBuffer << uint32(0);                                   // UNK02 - might be swaped with UNK03 and the pet fields 
-    
+    *dataBuffer << uint32(0);                                   // UNK02 - might be swaped with UNK03 and the pet fields
+
     dataBuffer->WriteByteSeq(guid[3]);
     dataBuffer->WriteByteSeq(guid[0]);
 
     *dataBuffer << uint8(facialHair);                           // Facial hair
     *dataBuffer << uint8(gender);                               // Gender
-    
+
     dataBuffer->WriteByteSeq(guildGuid[0]);
-    
+
     *dataBuffer << uint8(hairStyle);                            // Hair style
     *dataBuffer << uint8(level);                                // Level
 
@@ -2552,41 +2559,41 @@ bool Player::BuildEnumData(PreparedQueryResult result, ByteBuffer* dataBuffer, B
             if (enchant)
                 break;
         }
-        
+
         *dataBuffer << uint32(proto->DisplayInfoID);
         *dataBuffer << uint32(enchant ? enchant->aura_id : 0);
         *dataBuffer << uint8(proto->InventoryType);
     }
 
-    
+
     *dataBuffer << float(z);                                    // Z
-    
+
     dataBuffer->WriteByteSeq(guildGuid[1]);
 
     *dataBuffer << float(y);                                    // Y
     *dataBuffer << uint8(skin);                                 // Skin
     *dataBuffer << uint8(slot);                                 // List order
-    
+
     dataBuffer->WriteByteSeq(guildGuid[5]);
     dataBuffer->WriteByteSeq(guid[1]);
-    
-    *dataBuffer << uint32(0);                                   // UNK03 - might be swaped with UNK02 and the pet fields 
+
+    *dataBuffer << uint32(0);                                   // UNK03 - might be swaped with UNK02 and the pet fields
     *dataBuffer << float(x);                                    // X
 
     if (name.length())
         dataBuffer->append(name.c_str(), name.length());        // Name
-    
+
     *dataBuffer << uint32(mapId);                               // Map Id
     *dataBuffer << uint32(petFamily);                           // Pet family
-    
+
     *dataBuffer << uint8(hairColor);                            // Hair color
     *dataBuffer << uint8(playerClass);                          // Class
-    
+
     dataBuffer->WriteByteSeq(guildGuid[4]);
     dataBuffer->WriteByteSeq(guid[2]);
-    
+
     *dataBuffer << uint32(customizationFlag);
-    
+
     dataBuffer->WriteByteSeq(guid[7]);
     dataBuffer->WriteByteSeq(guildGuid[6]);
     dataBuffer->WriteByteSeq(guid[4]);
@@ -2661,7 +2668,7 @@ void Player::SendTeleportPacket(Position &oldPos)
     data.WriteBit(guid[1]);
     data.WriteBit(guid[2]);
     data.FlushBits();
-    
+
     data.WriteByteSeq(guid[2]);
     data.WriteByteSeq(guid[5]);
 
@@ -3597,11 +3604,11 @@ void Player::RemoveFromGroup(Group* group, uint64 guid, RemoveMethod method /* =
     }
 }
 
-// Below is related to EVENT_TRIAL_CAP_REACHED_LEVEL. 
+// Below is related to EVENT_TRIAL_CAP_REACHED_LEVEL.
 // Dismisses the XP bar and player cannot gain anymore XP. Used in tandem with PLAYER_FLAGS_NO_XP_GAIN Set / Remove.
 // Also a player selection option from the npc, allows making twinks.
-// Usage: 
-// If you do not want to gain XP, you can visit Behsten (Alliance) or Slahtz (Horde) to turn off all experience gain. 
+// Usage:
+// If you do not want to gain XP, you can visit Behsten (Alliance) or Slahtz (Horde) to turn off all experience gain.
 // It costs 10g to disable XP gain, and another 10g to re-enable it. Be aware that any potential XP gains wasted in this way cannot be recovered.
 // Disabling XP gain does not affect the gain of guild experience or guild reputation from turning in quests.
 // This is useful for players who wish to stay in a battleground bracket & still able to farm for better equipment and kill monsters without lvlup.
@@ -3920,7 +3927,7 @@ void Player::GiveLevel(uint8 level)
                 if (!HasByteFlag(PLAYER_FIELD_LIFETIME_MAX_RANK, 1, 0x01))
                     SetByteFlag(PLAYER_FIELD_LIFETIME_MAX_RANK, 1, 0x01);
             }
-    
+
     if (level == 85)
     {
         uint32 idQuest;
@@ -4051,7 +4058,7 @@ void Player::InitSpellForLevel()
             removeSpell(68992, false, false);
 
         if (HasSpell(97709))
-            removeSpell(97709, false, false); 
+            removeSpell(97709, false, false);
     }
 
     // Mage players learn automatically Portal: Vale of Eternal Blossom and Teleport: Vale of Eternal Blossom at level 90
@@ -4415,7 +4422,7 @@ bool Player::AddTalent(uint32 spellId, uint8 spec, bool learning)
     PlayerTalentMap::iterator itr = GetTalentMap(spec)->find(spellId);
     if (itr != GetTalentMap(spec)->end())
         itr->second->state = PLAYERSPELL_UNCHANGED;
-    else 
+    else
     {
 
         PlayerSpellState state = learning ? PLAYERSPELL_NEW : PLAYERSPELL_UNCHANGED;
@@ -5442,7 +5449,7 @@ bool Player::ResetTalents(bool no_cost)
 
     SetFreeTalentPoints(talentPointsForLevel);
     SetUsedTalentCount(0);
-    
+
     SQLTransaction charTrans = CharacterDatabase.BeginTransaction();
     SQLTransaction accountTrans = LoginDatabase.BeginTransaction();
     _SaveTalents(charTrans);
@@ -6583,7 +6590,7 @@ void Player::RepopAtGraveyard()
     // for example from WorldSession::HandleMovementOpcodes
 
     AreaTableEntry const* zone = GetAreaEntryByAreaID(GetAreaId());
-    
+
     if (!zone)
     {
         sLog->outInfo(LOG_FILTER_PLAYER, "Joueur %u dans une zone nulle; area id : %u", GetGUIDLow(), GetAreaId());
@@ -6660,7 +6667,7 @@ void Player::SendCemeteryList(bool onMap)
 bool Player::CanJoinConstantChannelInZone(ChatChannelsEntry const* channel, AreaTableEntry const* zone)
 {
 	if (channel->flags & CHANNEL_DBC_FLAG_LFG)
-	    return true; 
+	    return true;
 
     if (channel->flags & CHANNEL_DBC_FLAG_ZONE_DEP && zone->flags & AREA_FLAG_ARENA_INSTANCE)
         return false;
@@ -7286,7 +7293,7 @@ bool Player::UpdateCraftSkill(uint32 spellid)
 
             uint32 craft_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_CRAFTING);
             int skill_gain_chance = SkillGainChance(SkillValue, _spell_idx->second->max_value, (_spell_idx->second->max_value + _spell_idx->second->min_value)/2, _spell_idx->second->min_value);
-            
+
             // Since 4.0.x, we have bonus skill point reward with somes items ...
             if (_spell_idx->second && _spell_idx->second->skill_gain >craft_skill_gain && skill_gain_chance == sWorld->getIntConfig(CONFIG_SKILL_CHANCE_ORANGE)*10)
                 craft_skill_gain = _spell_idx->second->skill_gain;
@@ -8134,7 +8141,7 @@ void Player::RewardReputation(Unit* victim, float rate)
 
     if ((zone == 3483 || zone == 3562 || zone == 3836 || zone == 3713 || zone == 3714) && (HasAura(32096) || HasAura(32098)))
         favored_rep_mult = 0.25; // Thrallmar's Favor and Honor Hold's Favor
-    else if ((Rep->RepFaction1 == 609 || Rep->RepFaction2 == 609) && !ChampioningFaction && HasAura(30754))                   
+    else if ((Rep->RepFaction1 == 609 || Rep->RepFaction2 == 609) && !ChampioningFaction && HasAura(30754))
         favored_rep_mult = 0.25; // Cenarion Favor
 
     if (favored_rep_mult > 0)
@@ -8244,8 +8251,8 @@ void Player::RewardGuildReputationQuest(Quest const* quest)
     uint32 rep = 0;
 
     /* Patch notes 5.0.4:
-    Since guild reputation from quests is based on their guild experience yield (1 reputation per 360 experience before reputation bonuses), 
-    this dramatically increased guild experience from quests, from ~48 at level 85 (and significantly less at lower levels) to 166-167 
+    Since guild reputation from quests is based on their guild experience yield (1 reputation per 360 experience before reputation bonuses),
+    this dramatically increased guild experience from quests, from ~48 at level 85 (and significantly less at lower levels) to 166-167
     (before reputation bonuses) at all levels. */
 
     uint32 GUILD_REP_DIVIDER = 360;
@@ -8421,7 +8428,7 @@ bool Player::RewardHonor(Unit* victim, uint32 groupsize, int32 honor, bool pvpto
             honor_f /= groupsize;
 
     honor_f *= sWorld->getRate(RATE_HONOR);
-	
+
 	if(GetSession()->GetVipLevel())
         honor_f *= sWorld->getRate(RATE_HONOR_VIP);
 
@@ -8707,10 +8714,10 @@ uint32 Player::GetCurrencyOnSeason(uint32 id, bool usePrecision) const
     PlayerCurrenciesMap::const_iterator itr = _currencyStorage.find(id);
     if (itr == _currencyStorage.end())
         return 0;
-    
+
     CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(id);
     uint32 precision = (usePrecision && currency->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
-    
+
     return itr->second.seasonTotal / precision;
 }
 
@@ -9075,7 +9082,7 @@ void Player::UpdateArea(uint32 newArea)
 
     //Pandaria area update for monk level < 85
     if (area && getLevel() < 85 && getClass() == CLASS_MONK && GetMapId() == 870 && area->mapid == 870 &&
-        newArea != 6081 && newArea != 6526 && newArea != 6527 
+        newArea != 6081 && newArea != 6526 && newArea != 6527
         && GetZoneId() == 5841 && !isGameMaster())
         TeleportTo(870, 3818.55f, 1793.18f, 950.35f, GetOrientation());
 
@@ -10707,7 +10714,7 @@ void Player::SendNotifyLootMoneyRemoved(uint64 gold)
 
     uint8 byteOrder[8] = { 0, 4, 3, 2, 1, 7, 6, 5 };
     data.WriteBytesSeq(guid, byteOrder);
-    
+
     GetSession()->SendPacket(&data);
 }
 
@@ -11169,7 +11176,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
                 // 413,998,0,0.000000,0,0.000000,"Interface\TargetingFrame\UI-PVP-Horde","Victory Points: %6304w/1600","",0,0,"","","",0,0,0.000000,
                 // 418,998,0,0.000000,0,0.000000,"Interface\WorldStateFrame\ColumnIcon-FlagCapture2.blp","Orb Possessions","Number of times you have controlled an orb",0,2,"","","",0,0,0.000000,
                 // 419,998,0,0.000000,0,0.000000,"","Victory Points","Number of Victory Points earned",0,2,"","","",0,0,0.000000,
-                // 
+                //
                 // 2774,0,45,0,0,0,0,0,0,0,0,0,1708.836792,1244.149292,998,655,6051,"Power Orb","Uncontrolled",6960,16754,0.000000,0,
                 // 2775,0,45,0,0,0,0,0,0,0,0,0,1857.913208,1422.750000,998,655,6051,"Power Orb","Uncontrolled",6960,16757,0.000000,0,
                 // 2776,0,45,0,0,0,0,0,0,0,0,0,1855.027832,1245.364624,998,655,6051,"Power Orb","Uncontrolled",6960,16759,0.000000,0,
@@ -11202,15 +11209,15 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
                 BuildWorldState(data, 7939, 0x0);   // center neutral
 
                 BuildWorldState(data, 7936, 0x0);   // center conflict horde
-                BuildWorldState(data, 7933, 0x0);   // center horde 
+                BuildWorldState(data, 7933, 0x0);   // center horde
                 BuildWorldState(data, 7934, 0x0);   // center conflict alliance
-                BuildWorldState(data, 7937, 0x0);   // center alliance 
+                BuildWorldState(data, 7937, 0x0);   // center alliance
                 BuildWorldState(data, 7865, 0x0);   // goblin conflict horde
-                BuildWorldState(data, 7863, 0x0);   // goblin horde 
+                BuildWorldState(data, 7863, 0x0);   // goblin horde
                 BuildWorldState(data, 7864, 0x0);   // goblin conflict alliance
-                BuildWorldState(data, 7862, 0x0);   // goblin alliance 
+                BuildWorldState(data, 7862, 0x0);   // goblin alliance
                 BuildWorldState(data, 7861, 0x0);   // pandaren conflict horde
-                BuildWorldState(data, 7858, 0x0);   // pandaren horde 
+                BuildWorldState(data, 7858, 0x0);   // pandaren horde
                 BuildWorldState(data, 7857, 0x0);   // pandaren conflict alliance
                 BuildWorldState(data, 7859, 0x0);   // pandaren alliance
             }
@@ -11535,7 +11542,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
                 instance->FillInitialWorldStates(data);
             else
             {
-                BuildWorldState(data, 6046, 0);      // WORLDSTATE_FRAGMENTS_COLLECTED 
+                BuildWorldState(data, 6046, 0);      // WORLDSTATE_FRAGMENTS_COLLECTED
                 BuildWorldState(data, 6025, 0);      // WORLDSTATE_SHOW_FRAGMENTS
             }
             break;
@@ -14550,7 +14557,7 @@ void Player::DestroyItemCount(uint32 item, uint32 count, bool update, bool unequ
                 if (Item* pItem = pBag->GetItemByPos(j))
                 {
 
-                
+
                     if (pItem->GetEntry() == item && !pItem->IsInTrade())
                     {
                         // all items in bags can be unequipped
@@ -15390,7 +15397,7 @@ void Player::SendEquipError(InventoryResult msg, Item* pItem, Item* pItem2, uint
         data.WriteByteSeq(pItemGuid[7]);
 
         data << uint8(0);                       // bag type subclass, used with EQUIP_ERR_EVENT_AUTOEQUIP_BIND_CONFIRM and EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG2
-        
+
         data.WriteByteSeq(pItemGuid2[4]);
         data.WriteByteSeq(pItemGuid[6]);
 
@@ -15405,7 +15412,7 @@ void Player::SendEquipError(InventoryResult msg, Item* pItem, Item* pItem2, uint
             ItemTemplate const* proto = pItem ? pItem->GetTemplate() : sObjectMgr->GetItemTemplate(itemid);
             data << uint32(proto ? proto->ItemLimitCategory : 0);
         }
-        
+
         data.WriteByteSeq(pItemGuid2[2]);
         // no idea about this one...
         if (msg == EQUIP_ERR_NO_OUTPUT)
@@ -16525,7 +16532,7 @@ void Player::SendNewItem(Item* item, uint32 count, bool received, bool created, 
     data.WriteByteSeq(unknownGuid[5]);
     data.WriteByteSeq(unknownGuid[2]);
 
-    data << uint32(GetItemCount(item->GetEntry()));                     // count of items in inventory 
+    data << uint32(GetItemCount(item->GetEntry()));                     // count of items in inventory
     data << uint32((item->GetCount() == count) ? item->GetSlot() : -1); // item slot, but when added to stack: 0xFFFFFFFF
 
     data.WriteByteSeq(playerGuid[6]);
@@ -17119,7 +17126,7 @@ bool Player::CanSeeStartQuest(Quest const* quest)
 
 bool Player::CanTakeQuest(Quest const* quest, bool msg)
 {
-    return !DisableMgr::IsDisabledFor(DISABLE_TYPE_QUEST, quest->GetQuestId(), this) 
+    return !DisableMgr::IsDisabledFor(DISABLE_TYPE_QUEST, quest->GetQuestId(), this)
         && SatisfyQuestStatus(quest, msg) && SatisfyQuestExclusiveGroup(quest, msg)
         && SatisfyQuestTeam(quest, msg) && SatisfyQuestClass(quest, msg) && SatisfyQuestRace(quest, msg) && SatisfyQuestLevel(quest, msg)
         && SatisfyQuestSkill(quest, msg) && SatisfyQuestReputation(quest, msg)
@@ -17166,7 +17173,7 @@ bool Player::CanCompleteQuest(uint32 quest_id)
             return false;                                   // not allow re-complete quest
 
         // auto complete quest
-        if ((qInfo->IsAutoComplete() || qInfo->GetFlags() & QUEST_FLAGS_AUTOCOMPLETE) && CanTakeQuest(qInfo, false))          
+        if ((qInfo->IsAutoComplete() || qInfo->GetFlags() & QUEST_FLAGS_AUTOCOMPLETE) && CanTakeQuest(qInfo, false))
             return true;
 
         QuestStatusMap::iterator itr = m_QuestStatus.find(quest_id);
@@ -17589,7 +17596,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     Unit::AuraEffectList const& ModXPPctAuras = GetAuraEffectsByType(SPELL_AURA_MOD_XP_QUEST_PCT);
     for (Unit::AuraEffectList::const_iterator i = ModXPPctAuras.begin(); i != ModXPPctAuras.end(); ++i)
         AddPct(XP, (*i)->GetAmount());
-		
+
 		if (GetSession()->GetVipLevel())
         XP *= sWorld->getRate(RATE_XP_QUEST_VIP);
 
@@ -19010,9 +19017,9 @@ void Player::SendQuestReward(Quest const* quest, uint32 XP, Object* questGiver)
     data << uint32(quest->GetRewardSkillPoints());         // 4.x bonus skill points. May need swapped with talents.
     data << uint32(questId);
     data << uint32(quest->GetBonusTalents());              // 3.x bonus talents (still sent to 5.4.7 client)
-    data << uint32(quest->GetRewardSkillId());             
-    data << uint32(moneyReward);             
-    data << uint32(xp);        
+    data << uint32(quest->GetRewardSkillId());
+    data << uint32(moneyReward);
+    data << uint32(xp);
 
     data.WriteBit(hasMoreQuestsInChain);                  // HasNextQuestInChain, true if there's another quest in the chain. Was 1.
     data.WriteBit(hasMoreQuestsInChain);                  // NextQuestOpenWindow, open the gossip windows for the next quest. Was 1.
@@ -19177,7 +19184,7 @@ void Player::SendQuestUpdateAddCreatureOrGo(Quest const* quest, uint64 objGuid, 
 
     // Send packet.
     WorldPacket data(SMSG_QUESTUPDATE_ADD_CREDIT, 4 + 4 + 1 + 8);
-    
+
     uint8 bitOrder[8] = { 5, 3, 6, 7, 4, 1, 2, 0};
     data.WriteBitInOrder(guid, bitOrder);
 
@@ -19203,7 +19210,7 @@ void Player::SendQuestUpdateAddCreatureOrGo(Quest const* quest, uint64 objGuid, 
     data.WriteByteSeq(guid[7]);
 
     data << uint32(quest->GetQuestId());
-    
+
     GetSession()->SendPacket(&data);
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_QUESTUPDATE_ADD_CREDIT");
@@ -20079,7 +20086,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder, PreparedQueryResult
     m_achievementMgr.CheckAllAchievementCriteria(this);
 
     _LoadEquipmentSets(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOADEQUIPMENTSETS));
-    
+
     /*if (QueryResult PersonnalRateResult = CharacterDatabase.PQuery("SELECT rate FROM character_rates WHERE guid='%u' LIMIT 1", GetGUIDLow()))
         m_PersonnalXpRate = (PersonnalRateResult->Fetch())[0].GetFloat();*/
 
@@ -23509,7 +23516,7 @@ void Player::PetSpellInitialize()
         if (categoryitr != pet->m_CreatureCategoryCooldowns.end())
         {
             time_t categoryCooldown = (categoryitr->second > curTime) ? (categoryitr->second - curTime) * IN_MILLISECONDS : 0;
-            
+
             data << uint32(cooldown);               // spell cooldown
             data << uint32(itr->first);             // spell ID
             data << uint32(categoryCooldown);       // category cooldown
@@ -23534,7 +23541,7 @@ void Player::PetSpellInitialize()
     data.WriteByteSeq(guid[2]);
     data.WriteByteSeq(guid[4]);
     data.WriteByteSeq(guid[5]);
-    data << uint8(pet->GetReactState()); 
+    data << uint8(pet->GetReactState());
     data << uint8(charmInfo->GetCommandState());
     data << uint16(0); // Flags, mostly unknown
     data.WriteByteSeq(guid[0]);
@@ -23556,7 +23563,7 @@ void Player::PetSpellInitialize()
             data << uint32(MAKE_UNIT_ACTION_BUTTON(itr->first, itr->second.active));
         }
     }
-    
+
     data.WriteByteSeq(guid[6]);
     data << uint32(pet->GetDuration());
     data.WriteByteSeq(guid[7]);
@@ -23594,7 +23601,7 @@ void Player::PossessSpellInitialize()
     data.WriteBit(guid[7]);
     data.WriteBit(guid[4]);
     data.WriteBits(0, 22);
-    
+
     data.WriteByteSeq(guid[2]);
     data.WriteByteSeq(guid[4]);
     data.WriteByteSeq(guid[5]);
@@ -23606,7 +23613,7 @@ void Player::PossessSpellInitialize()
 
     // action bar loop
     charmInfo->BuildActionBar(&data);
-    
+
     data.WriteByteSeq(guid[6]);
     data << uint32(0);
     data.WriteByteSeq(guid[7]);
@@ -23625,7 +23632,7 @@ void Player::VehicleSpellInitialize()
     ObjectGuid guid = vehicle->GetGUID();
 
     WorldPacket data(SMSG_PET_SPELLS);
-    
+
     data.WriteBit(guid[5]);
     data.WriteBit(guid[0]);
     data.WriteBit(guid[2]);
@@ -23761,7 +23768,7 @@ void Player::CharmSpellInitialize()
     ObjectGuid guid = charm->GetGUID();
 
     WorldPacket data(SMSG_PET_SPELLS);
-    
+
     data.WriteBit(guid[5]);
     data.WriteBit(guid[0]);
     data.WriteBit(guid[2]);
@@ -23818,7 +23825,7 @@ void Player::SendRemoveControlBar()
         return;
 
     ObjectGuid guid = vehicle->GetGUID();
-    
+
     WorldPacket data(SMSG_PET_SPELLS);
     data.WriteBit(guid[5]);
     data.WriteBit(guid[0]);
@@ -23988,7 +23995,7 @@ void Player::RestoreSpellMods(Spell* spell, uint32 ownerAuraId, AuraPtr aura)
                 continue;
 
             // Remove from list - This will be done after all mods have been gone through
-            // to ensure we iterate over all mods of an aura before removing said aura from applied mods 
+            // to ensure we iterate over all mods of an aura before removing said aura from applied mods
             // (Else, an aura with two mods on the current spell would only see the first of its modifier restored).
             aurasQueue.push_back(std::const_pointer_cast<Aura>(mod->ownerAura));
 
@@ -24919,7 +24926,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
             }
 
             uint32 precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
-            
+
             // Second field in dbc is season count except two strange rows
             if (i == 1 && iece->ID != 2999)
             {
@@ -24971,7 +24978,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
             if (!guild->GetAchievementMgr().HasAchieved(reward.AchievementId))
             {
                 if (!(reward.AchievementId == 5492 && guild->GetAchievementMgr().HasAchieved(4912)) && !(reward.AchievementId == 4912 && guild->GetAchievementMgr().HasAchieved(5492)))
-                { 
+                {
                     SendBuyError(BUY_ERR_CANT_FIND_ITEM, creature, item, 0);
                     return false;
                 }
@@ -25031,7 +25038,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
     }
 
     if (crItem->maxcount != 0) // bought
-    { 
+    {
         if (pProto->Quality > ITEM_QUALITY_EPIC || (pProto->Quality == ITEM_QUALITY_EPIC && pProto->ItemLevel >= MinNewsItemLevel[sWorld->getIntConfig(CONFIG_EXPANSION)]))
             if (Guild* guild = sGuildMgr->GetGuildById(GetGuildId()))
                 guild->GetNewsLog().AddNewEvent(GUILD_NEWS_ITEM_PURCHASED, time(NULL), GetGUID(), 0, item);
@@ -25335,7 +25342,7 @@ void Player::SendCooldownEvent(SpellInfo const* spellInfo, uint32 itemId /*= 0*/
     data.WriteByteSeq(guid[6]);
     data << uint32(spellInfo->Id);
     data.WriteByteSeq(guid[7]);
-    
+
     SendDirectMessage(&data);
 }
 
@@ -26150,7 +26157,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
     // Send Player Talent Data and Initial Spells.
     SendTalentsInfoData(false);
     SendInitialSpells();
-    
+
     //4374 - summon pet spell in packet - 111896, 111895, 111859, 111897, 111898
     //5376
 
@@ -26380,7 +26387,7 @@ void Player::SendInstanceResetWarning(uint32 mapid, Difficulty difficulty, uint3
 
     WorldPacket data(SMSG_RAID_INSTANCE_MESSAGE, 4+4+4+4);
 
-    data << uint32(difficulty);  
+    data << uint32(difficulty);
     data << uint32(mapid);
     data << uint32(time);
     data << uint8(type);
@@ -26656,7 +26663,7 @@ void Player::SendAurasForTarget(Unit* target)
         //powerCounter = packet.ReadBits(21);
         //packet.StartBitStream(guid2, 3, 1, 2, 4, 5);
     }
-    
+
     if (auraCount > 0)
     {
         for (Unit::VisibleAuraMap::const_iterator itr = visibleAuras->begin(); itr != visibleAuras->end(); ++itr)
@@ -26703,7 +26710,7 @@ void Player::SendAurasForTarget(Unit* target)
         //packet.ReadXORBytes(guid2, 0, 2);
         //packet.WriteGuid("PowerUnitGUID", guid2);
     }
-    
+
     uint8 orderGuid[8] = {0, 1, 3, 4, 2, 6, 7, 5};
     data.WriteBytesSeq(targetGuid, orderGuid);
 
@@ -28661,6 +28668,11 @@ void Player::UpdateAchievementCriteria(AchievementCriteriaTypes type, uint64 mis
 
     if (Guild* guild = sGuildMgr->GetGuildById(GetGuildId()))
         guild->GetAchievementMgr().UpdateAchievementCriteria(type, miscValue1, miscValue2, miscValue3, unit, this);
+
+    if (IsInWorld())
+        if (InstanceMap* instanceMap = GetMap()->ToInstanceMap())
+            if (InstanceScenario* scenario = instanceMap->GetInstanceScenario())
+                scenario->UpdateCriteria(type, miscValue1, miscValue2, miscValue3, unit, this);
 }
 
 void Player::CompletedAchievement(AchievementEntry const* entry)
@@ -28835,7 +28847,7 @@ void Player::BuildPlayerTalentsInfoData(WorldPacket* data)
             for (uint8 i = 0; i < MAX_GLYPH_SLOT_INDEX; ++i)
                 *data << uint16(GetGlyph(specIdx, i));               // GlyphProperties.dbc
         }
-        
+
         delete[] talentCount;
         talentCount = NULL;
     }
@@ -28923,7 +28935,7 @@ void Player::SendEquipmentSetList()
 
     uint8 equipBitsOrder[8] = { 0, 2, 3, 1, 6, 7, 4, 5 };
     uint8 equipBytesOrder[8] = { 2, 1, 0, 5, 3, 4, 6, 7 };
-    
+
     for (EquipmentSets::iterator itr = m_EquipmentSets.begin(); itr != m_EquipmentSets.end(); ++itr)
     {
         if (itr->second.state == EQUIPMENT_SET_DELETED)
@@ -28957,7 +28969,7 @@ void Player::SendEquipmentSetList()
         data.WriteBit(setGuid[5]);
         data.WriteBit(setGuid[2]);
     }
-    
+
     data.FlushBits();
 
     for (EquipmentSets::iterator itr = m_EquipmentSets.begin(); itr != m_EquipmentSets.end(); ++itr)
@@ -29624,7 +29636,7 @@ void Player::SendRefundInfo(Item* item)
     data.FlushBits();
 
     data << uint32(item->GetPaidMoney());                           // Money cost
-    
+
     for (uint8 i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
     {
         uint32 precision = 1;
@@ -29635,7 +29647,7 @@ void Player::SendRefundInfo(Item* item)
         data << uint32(iece->RequiredCurrency[i]);
         data << uint32(iece->RequiredCurrencyCount[i] / precision);       // Must be divided by precision
     }
-    
+
     data << uint32(GetTotalPlayedTime() - item->GetPlayedTime());   // Time Left
     data.WriteByteSeq(itemGuid[3]);
     data.WriteByteSeq(itemGuid[1]);
@@ -29645,13 +29657,13 @@ void Player::SendRefundInfo(Item* item)
         data << uint32(iece->RequiredItem[i]);
         data << uint32(iece->RequiredItemCount[i]);
     }
-    
+
     data.WriteByteSeq(itemGuid[0]);
     data.WriteByteSeq(itemGuid[6]);
     data.WriteByteSeq(itemGuid[4]);
-    
+
     data << uint32(0);                                              // Unk
-    
+
     data.WriteByteSeq(itemGuid[2]);
     data.WriteByteSeq(itemGuid[7]);
 
@@ -29975,7 +29987,7 @@ void Player::_LoadCUFProfiles(PreparedQueryResult result)
 
 void Player::SendCUFProfiles()
 {
-    
+
     WorldPacket data(SMSG_LOAD_CUF_PROFILES);
 
     data.WriteBits(m_cufProfiles.size(), 19);
@@ -30033,7 +30045,7 @@ void Player::SendCUFProfiles()
         data << uint16(cdata.unk6);
         data << uint8(cdata.unk5);
         data << uint16(cdata.frameHeight);
-        data << uint16(cdata.unk1); 
+        data << uint16(cdata.unk1);
     }
 
     GetSession()->SendPacket(&data);

@@ -22,7 +22,7 @@
 // x - skip<uint32>, X - skip<uint8>, s - char*, f - float, i - uint32, b - uint8, d - index (not included)
 // n - index (included), l - bool, p - field present in sql dbc, a - field absent in sql dbc
 
-const char Achievementfmt[]                   = "niixsxiixixxiix";
+const char Achievementfmt[]                   = "niixsxiixixxiii";
 const std::string CustomAchievementfmt        = "pppaaaapapaappa";
 const std::string CustomAchievementIndex      = "ID";
 const char AchievementCriteriafmt[]           = "niiiixiiiisiiiiixxiiiii";
@@ -48,6 +48,8 @@ const char CreatureModelDatafmt[]             = "nxxxxxxxxxxxxxxffxxxxxxxxxxxxxx
 const char CreatureFamilyfmt[]                = "nfifiiiiixsx";
 const char CreatureSpellDatafmt[]             = "niiiixxxx";
 const char CreatureTypefmt[]                  = "nxx";
+char const Criteriafmt[]                      = "niiiiixxiiii";
+char const CriteriaTreefmt[]                  = "niixiiis";
 const char CurrencyTypesfmt[]                 = "nixxxxiiiixx";
 const char DestructibleModelDatafmt[]         = "nixxxixxxxixxxxixxxxixxx";
 const char DungeonEncounterfmt[]              = "niixisxxx";
@@ -102,6 +104,7 @@ const char PhaseEntryfmt[]                    = "nsi";
 const char MailTemplateEntryfmt[]             = "nxs";
 const char MapEntryfmt[]                      = "nxiixsixxixiffxiiii";
 const char MapDifficultyEntryfmt[]            = "diisiix";
+char const ModifierTreefmt[]                  = "niiiixi";
 const char MovieEntryfmt[]                    = "nxxxx";
 const char MountCapabilityfmt[]               = "niiiiiii";
 const char MountTypefmt[]                     = "niiiiiiiiiiiiiiiiiiiiiiii";
@@ -119,6 +122,9 @@ const char ResearchProjectfmt[]               = "nxxiiixxi";
 const char ResearchSitefmt[]                  = "niixx";
 const char ScalingStatDistributionfmt[]       = "niiiiiiiiiiiiiiiiiiiixi";
 const char ScalingStatValuesfmt[]             = "iniiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiix";
+const char ScenarioEntryfmt[]                 = "nsb";
+const char ScenarioEventEntryfmt[]            = "nib";
+const char ScenarioStepEntryfmt[]             = "niibssi";
 const char SkillLinefmt[]                     = "nisxixixi";
 const char SkillLineAbilityfmt[]              = "niiiiiiiiiixx";
 const char SoundEntriesfmt[]                  = "nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";

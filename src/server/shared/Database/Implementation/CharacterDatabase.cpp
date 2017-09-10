@@ -295,7 +295,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
 
     // Archaeology
     PREPARE_STATEMENT(CHAR_SEL_CHAR_ARCHAEOLOGY, "SELECT sites0, sites1, sites2, sites3, counts, projects, completed FROM character_archaeology WHERE guid = ?", CONNECTION_ASYNC);
-    
+
     PREPARE_STATEMENT(CHAR_DEL_CUF_PROFILE, "DELETE FROM cuf_profile WHERE guid = ?", CONNECTION_ASYNC);
     PREPARE_STATEMENT(CHAR_REP_CUF_PROFILE, "REPLACE INTO cuf_profile (guid, name, data) VALUES (?, ?, ?)", CONNECTION_ASYNC);
     PREPARE_STATEMENT(CHAR_SEL_CUF_PROFILE, "SELECT name, data FROM cuf_profile WHERE guid = ?", CONNECTION_ASYNC);
@@ -655,4 +655,13 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PREPARE_STATEMENT(CHAR_INS_DYN_DIFFICULTY_MAP, "INSERT INTO character_dynamic_difficulty_maps (guid, mapId) VALUES (?, ?)", CONNECTION_ASYNC);
     PREPARE_STATEMENT(CHAR_DEL_DYN_DIFFICULTY_MAP, "DELETE FROM character_dynamic_difficulty_maps WHERE guid = ? AND mapId = ?", CONNECTION_ASYNC);
     PREPARE_STATEMENT(CHAR_SEL_DYN_DIFFICULTY_MAP, "SELECT mapId FROM character_dynamic_difficulty_maps WHERE guid = ? AND mapId = ?", CONNECTION_SYNCH);
+
+    // Scenario
+    PREPARE_STATEMENT(CHAR_SEL_SCENARIO_INSTANCE_CRITERIA_FOR_INSTANCE, "SELECT criteria, counter, date FROM instance_scenario_progress WHERE id = ?", CONNECTION_SYNCH);
+    PREPARE_STATEMENT(CHAR_SEL_SCENARIO_INSTANCE_CRITERIA, "SELECT counter, date FROM instance_scenario_progress WHERE id = ? AND criteria = ?", CONNECTION_SYNCH);
+    PREPARE_STATEMENT(CHAR_INS_SCENARIO_INSTANCE_CRITERIA, "INSERT INTO instance_scenario_progress (id, criteria, counter, date) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC);
+    PREPARE_STATEMENT(CHAR_DEL_SCENARIO_INSTANCE_CRITERIA_FOR_INSTANCE, "DELETE FROM instance_scenario_progress WHERE id = ?", CONNECTION_ASYNC);
+    PREPARE_STATEMENT(CHAR_UPD_SCENARIO_INSTANCE_CRITERIA, "UPDATE instance_scenario_progress SET counter = ?, date = ? WHERE id = ? AND criteria = ?", CONNECTION_ASYNC);
+    PREPARE_STATEMENT(CHAR_DEL_INVALID_SCENARIO_INSTANCE_CRITERIA, "DELETE FROM instance_scenario_progress WHERE id = ? AND criteria = ?", CONNECTION_ASYNC);
+ }
 }
