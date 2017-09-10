@@ -6,12 +6,10 @@ Mists of Pandaria SmartAI Scripts TODO:
 Pandaria Zones:
 
 -- Dread Wastes
--- Isle of Giants
 -- Isle of Thunder
 -- Krasarang Wilds
 -- Kun-Lai Summit
 -- The Jade Forest
--- The Veiled Stair
 -- Timeless Isle
 -- Townlong Steppes
 -- Vale of Eternal Blossoms
@@ -39,8 +37,8 @@ Mists of Pandaria Start Zones Quests ( 1-5 lvl ) TODO:
 Mists of Pandaria Misc TODO:
 
 -- Battle Pets
--- Character Boost
 -- Mmaps
+-- Scenarious
 -- Items: 112327, 112326
 -- Fix all DB Logs Errors
 -- fix Random not working Quests in the world
