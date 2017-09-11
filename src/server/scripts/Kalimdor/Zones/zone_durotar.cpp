@@ -124,15 +124,112 @@ public:
 	}
 };
 
+/*######
+## Quest 25165: Never Trust a Big Barb and a Smile
+## npc_clattering_scorpid
+######*/
+enum ClatteringScorpidData
+{
+    //Text
+    EMOTE_CLATTERING_SCORPID                    = 0,
+    //npc
+    NPC_POISON_EXTRACTION_TOTEM                 = 39236,
+    //Spell
+    SPELL_SUNDERING_CLEAVE                      = 79687,
+    SPELL_ENVENOM                               = 73672,
+    SPELL_POISON_EXTRACTION_TOTEM               = 73673,
+    //Quest
+    QUEST_NEVER_TRUST_A_BIG_BARB_AND_A_SMILE    = 25165,
+    //Events
+    EVENT_SUNDERING_CLEAVE                      = 1,
+    EVENT_ENVENOM
+};
+
+class npc_clattering_scorpid : public CreatureScript
+{
+    public:
+        npc_clattering_scorpid() : CreatureScript("npc_clattering_scorpid") { }
+
+        struct npc_clattering_scorpidAI : public ScriptedAI
+        {
+            npc_clattering_scorpidAI(Creature* creature) : ScriptedAI(creature) { }
+
+            void Reset()
+            {
+                events.Reset();
+            }
+            
+            void EnterCombat(Unit* /*who*/)
+            {
+                events.ScheduleEvent(EVENT_SUNDERING_CLEAVE, urand(4000, 4500));
+                events.ScheduleEvent(EVENT_ENVENOM, urand(2000, 9000));
+            }
+            
+            void SpellHitTarget(Unit* target, const SpellInfo* spell)
+            {
+                if (spell->Id == SPELL_ENVENOM)
+                {
+                    if (Player* player = target->ToPlayer())
+                    {
+                        if (player->HasAura(SPELL_POISON_EXTRACTION_TOTEM))
+                            player->KilledMonsterCredit(NPC_POISON_EXTRACTION_TOTEM);
+                    }
+                }
+            }
+
+            void UpdateAI(uint32 const diff)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case EVENT_SUNDERING_CLEAVE:
+                            DoCastVictim(SPELL_SUNDERING_CLEAVE);
+                            events.ScheduleEvent(EVENT_SUNDERING_CLEAVE, urand(32000, 38000));
+                            break;
+                        case EVENT_ENVENOM:
+                            if (Player* player = me->getVictim()->ToPlayer())
+                            {
+                                if (player->GetQuestStatus(QUEST_NEVER_TRUST_A_BIG_BARB_AND_A_SMILE) == QUEST_STATUS_INCOMPLETE)
+                                    Talk(EMOTE_CLATTERING_SCORPID, player->GetGUID());
+                            }
+                            DoCastVictim(SPELL_ENVENOM);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                DoMeleeAttackIfReady();
+            }
+
+            private:
+                EventMap events;
+        };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_clattering_scorpidAI(creature);
+        }
+};
+
 enum VoodooSpells
 {
-	SPELL_BREW = 16712, // Special Brew
-	SPELL_GHOSTLY = 16713, // Ghostly
-	SPELL_HEX1 = 16707, // Hex
-	SPELL_HEX2 = 16708, // Hex
-	SPELL_HEX3 = 16709, // Hex
-	SPELL_GROW = 16711, // Grow
-	SPELL_LAUNCH = 16716, // Launch (Whee!)
+    SPELL_BREW = 16712, // Special Brew
+    SPELL_GHOSTLY = 16713, // Ghostly
+    SPELL_HEX1 = 16707, // Hex
+    SPELL_HEX2 = 16708, // Hex
+    SPELL_HEX3 = 16709, // Hex
+    SPELL_GROW = 16711, // Grow
+    SPELL_LAUNCH = 16716, // Launch (Whee!)
 };
 
 // Voodoo - 17009.
@@ -283,6 +380,7 @@ enum Watershed // quest 25187 item 52514 spell 73817 http://www.youtube.com/watc
 void AddSC_durotar()
 {
     new npc_lazy_peon();
+    new npc_clattering_scorpid();
     new spell_voodoo();
     new npc_bblade_cultist();
 }
