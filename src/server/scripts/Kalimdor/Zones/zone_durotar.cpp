@@ -33,19 +33,19 @@
 enum LazyPeonData
 {
 	//Spells
-	SPELL_PEON_SLEEPING = 17743,
-	SPELL_AWAKEN_PEON = 19938,
+	SPELL_PEON_SLEEPING       = 17743,
+	SPELL_AWAKEN_PEON         = 19938,
 	//Gameobject
-	GO_LUMBERPILE = 175784,
+	GO_LUMBERPILE             = 175784,
 	//Quest
-	QUEST_LAZY_PEONS = 25134,
+	QUEST_LAZY_PEONS          = 25134,
 	//Events
-	EVENT_AWAKEN_PEON = 1,
+	EVENT_AWAKEN_PEON         = 1,
 	EVENT_IN_POINT,
 	EVENT_HOME,
 	EVENT_PEON_SLEEPING,
 	//Point
-	POINT_1 = 1
+	POINT_1                   = 1
 };
 
 class npc_lazy_peon : public CreatureScript
@@ -223,13 +223,13 @@ class npc_clattering_scorpid : public CreatureScript
 
 enum VoodooSpells
 {
-    SPELL_BREW = 16712, // Special Brew
-    SPELL_GHOSTLY = 16713, // Ghostly
-    SPELL_HEX1 = 16707, // Hex
-    SPELL_HEX2 = 16708, // Hex
-    SPELL_HEX3 = 16709, // Hex
-    SPELL_GROW = 16711, // Grow
-    SPELL_LAUNCH = 16716, // Launch (Whee!)
+    SPELL_BREW        = 16712, // Special Brew
+    SPELL_GHOSTLY     = 16713, // Ghostly
+    SPELL_HEX1        = 16707, // Hex
+    SPELL_HEX2        = 16708, // Hex
+    SPELL_HEX3        = 16709, // Hex
+    SPELL_GROW        = 16711, // Grow
+    SPELL_LAUNCH      = 16716, // Launch (Whee!)
 };
 
 // Voodoo - 17009.
