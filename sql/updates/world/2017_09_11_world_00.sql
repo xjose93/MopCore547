@@ -1,3 +1,6 @@
+-- delete double oondasta spawn
+DELETE FROM creature WHERE guid=344679;
+
 -- add loot to npc 55195 --
 INSERT INTO creature_loot_template VALUES (61562, 74260, 48, 1, 0, 1, 1);
 
@@ -61,5 +64,3 @@ INSERT INTO creature_loot_template VALUES (55195, 81996, 0.01, 1, 0, 1, 1);
 -- add loot to npc 50828 --
 INSERT INTO creature_loot_template VALUES (50828, 86591, 10, 1, 0, 1, 1);
 
--- delete double oondasta spawn
-DELETE FROM creature WHERE guid=344679;
