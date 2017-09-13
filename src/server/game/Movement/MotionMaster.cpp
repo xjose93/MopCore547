@@ -45,7 +45,7 @@ void MotionMaster::Initialize()
         MovementGenerator* current = top();
         pop();
         if (current)
-            DirectDelete(current);   
+            DirectDelete(current);
     }
 
     InitDefault();
@@ -408,7 +408,7 @@ void MotionMaster::MoveJump(float x, float y, float z, float speedXY, float spee
     float max_height = -Movement::computeFallElevation(moveTimeHalf, false, -speedZ);
 
     Movement::MoveSplineInit init(_owner);
-    init.MoveTo(x, y, z);
+    init.MoveTo(x, y, z, false);
     init.SetParabolic(max_height, 0);
     init.SetVelocity(speedXY);
     if (o < 6.82f)
@@ -428,7 +428,7 @@ void MotionMaster::CustomJump(float x, float y, float z, float speedXY, float sp
     max_height /= 15.0f;
 
     Movement::MoveSplineInit init(_owner);
-    init.MoveTo(x, y, z);
+    init.MoveTo(x, y, z, false);
     init.SetParabolic(max_height, 0);
     init.SetVelocity(speedXY);
     init.Launch();
@@ -456,7 +456,7 @@ void MotionMaster::MoveFall(uint32 id/*=0*/)
     }
 
     Movement::MoveSplineInit init(_owner);
-    init.MoveTo(_owner->GetPositionX(), _owner->GetPositionY(), mapHeight);
+    init.MoveTo(_owner->GetPositionX(), _owner->GetPositionY(), mapHeight, false);
     init.SetFall();
     init.Launch();
     Mutate(new EffectMovementGenerator(id), MOTION_SLOT_CONTROLLED);

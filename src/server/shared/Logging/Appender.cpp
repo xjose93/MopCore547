@@ -216,8 +216,6 @@ char const* Appender::getLogFilterTypeString(LogFilterType type)
             return "BATTLEFIELD";
         case LOG_FILTER_SERVER_LOADING:
             return "SERVER LOADING";
-        case LOG_FILTER_PHASE:
-            return "PHASES";
         case LOG_FILTER_OPCODES:
             return "OPCODE";
         default:

@@ -140,7 +140,9 @@ namespace MMAP
             mapID = (*itr).m_mapId;
 
             files.clear();
-            getDirContents(files, "vmaps", std::string("%04u_*.vmtile" + mapID));
+            char temp[50];
+            sprintf(temp, "%04u_*.vmtile", mapID);
+            getDirContents(files, "vmaps", temp);
             for (uint32 i = 0; i < files.size(); ++i)
             {
                 tileX = uint32(atoi(files[i].substr(8, 2).c_str()));
@@ -152,7 +154,8 @@ namespace MMAP
             }
 
             files.clear();
-            getDirContents(files, "maps", std::string("%04u*" + mapID));
+            sprintf(temp, "%04u*", mapID);
+            getDirContents(files, "maps", temp);
             for (uint32 i = 0; i < files.size(); ++i)
             {
                 tileY = uint32(atoi(files[i].substr(5, 2).c_str()));

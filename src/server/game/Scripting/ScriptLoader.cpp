@@ -75,6 +75,7 @@ void AddSC_list_commandscript();
 void AddSC_lookup_commandscript();
 void AddSC_message_commandscript();
 void AddSC_misc_commandscript();
+void AddSC_mmaps_commandscript();
 void AddSC_modify_commandscript();
 void AddSC_npc_commandscript();
 void AddSC_quest_commandscript();
@@ -196,7 +197,7 @@ void AddSC_boss_baron_silverlaine();
 void AddSC_boss_commander_springvale();
 void AddSC_boss_lord_valden();
 void AddSC_boss_lord_godfrey();
-void AddSC_shadowfang_keep();                
+void AddSC_shadowfang_keep();
 void AddSC_instance_shadowfang_keep();
 
 // Classic Dungeons - Stratholme (Eastern Kingdoms)
@@ -707,7 +708,7 @@ void AddSC_boss_razorscale();
 void AddSC_boss_xt002();
 void AddSC_boss_assembly_of_iron();
 void AddSC_boss_kologarn();
-void AddSC_boss_auriaya();              
+void AddSC_boss_auriaya();
 void AddSC_boss_hodir();
 void AddSC_boss_yogg_saron();
 void AddSC_boss_freya();
@@ -733,7 +734,7 @@ void AddSC_instance_trial_of_the_crusader();
 void AddSC_instance_icecrown_citadel();
 void AddSC_icecrown_citadel();
 void AddSC_icecrown_citadel_teleport();
-void AddSC_boss_lord_marrowgar();       
+void AddSC_boss_lord_marrowgar();
 void AddSC_boss_lady_deathwhisper();
 void AddSC_boss_gunship_battle();
 void AddSC_boss_deathbringer_saurfang();
@@ -1161,6 +1162,7 @@ void AddCommandScripts()
     AddSC_list_commandscript();
     AddSC_message_commandscript();
     AddSC_misc_commandscript();
+    AddSC_mmaps_commandscript();
     AddSC_modify_commandscript();
     AddSC_npc_commandscript();
     AddSC_quest_commandscript();
@@ -1298,7 +1300,7 @@ void AddEasternKingdomsScripts()
     AddSC_boss_commander_springvale();
     AddSC_boss_lord_valden();
     AddSC_boss_lord_godfrey();
-    AddSC_shadowfang_keep();                
+    AddSC_shadowfang_keep();
     AddSC_instance_shadowfang_keep();
     AddSC_boss_magistrate_barthilas();      //Stratholme
     AddSC_boss_maleki_the_pallid();
@@ -1492,7 +1494,7 @@ void AddKalimdorScripts()
 	AddSC_boss_lord_pythas();
 	AddSC_boss_lord_cobrahn();
 	AddSC_boss_lady_anacondra();
-	
+
     AddSC_zulfarrak();                      //Zul'Farrak generic
     AddSC_instance_zulfarrak();             //Zul'Farrak instance script
     AddSC_gilneas();
@@ -1774,7 +1776,7 @@ void AddNorthrendScripts()
     AddSC_boss_xt002();
     AddSC_boss_assembly_of_iron();
     AddSC_boss_kologarn();
-    AddSC_boss_auriaya();    
+    AddSC_boss_auriaya();
 	AddSC_boss_yogg_saron();
     AddSC_boss_hodir();
     AddSC_boss_freya();
@@ -1828,7 +1830,7 @@ void AddNorthrendScripts()
     AddSC_instance_icecrown_citadel(); // Icecrown Citadel
     AddSC_icecrown_citadel();
     AddSC_icecrown_citadel_teleport();
-    AddSC_boss_lord_marrowgar();       
+    AddSC_boss_lord_marrowgar();
     AddSC_boss_lady_deathwhisper();
     AddSC_boss_gunship_battle();
     AddSC_boss_deathbringer_saurfang();

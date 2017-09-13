@@ -545,7 +545,7 @@ void Unit::UpdateSplineMovement(uint32 t_diff)
 
     if (arrived)
         DisableSpline();
- 
+
     m_movesplineTimer.Update(t_diff);
     if (m_movesplineTimer.Passed() || arrived)
         UpdateSplinePosition();
@@ -598,7 +598,7 @@ void Unit::SendMoveKnockBack(Player* player, float speedXY, float speedZ, float 
 
     ObjectGuid guid = GetGUID();
     WorldPacket data(SMSG_MOVE_KNOCK_BACK, (1 + 8 + 4 + 4 + 4 + 4 + 4));
-    
+
     uint8 bitOrder[8] = {4, 6, 0, 7, 5, 3, 1, 2};
     data.WriteBitInOrder(guid, bitOrder);
 
@@ -1061,7 +1061,7 @@ void Unit::SendMoveRoot(uint32 value)
 {
     ObjectGuid guid = GetGUID();
     WorldPacket data(SMSG_MOVE_ROOT, 1 + 8 + 4);
-    
+
     uint8 bitOrder[8] = {5, 3, 6, 0, 1, 4, 2, 7};
     data.WriteBitInOrder(guid, bitOrder);
 
@@ -1110,7 +1110,7 @@ void Unit::SendTeleportPacket(Position& oldPos)
     ObjectGuid transGuid = GetTransGUID();
 
     bool hasTransport = (uint64(transGuid) != 0LL);
-    bool teleportWithVehicle = IsOnVehicle(); 
+    bool teleportWithVehicle = IsOnVehicle();
 
     WorldPacket data(SMSG_MOVE_TELEPORT, 38);
 
@@ -1242,7 +1242,7 @@ void Unit::SetInFront(Unit const* target)
 void Unit::SetFacingTo(float ori)
 {
     Movement::MoveSplineInit init(this);
-    init.MoveTo(GetPositionX(), GetPositionY(), GetPositionZMinusOffset());
+    init.MoveTo(GetPositionX(), GetPositionY(), GetPositionZMinusOffset(), false);
     init.SetFacing(ori);
     init.Launch();
 }
@@ -1254,7 +1254,7 @@ void Unit::SetFacingToObject(WorldObject* object)
         return;
 
     Movement::MoveSplineInit init(this);
-    init.MoveTo(GetPositionX(), GetPositionY(), GetPositionZMinusOffset());
+    init.MoveTo(GetPositionX(), GetPositionY(), GetPositionZMinusOffset(), false);
     init.SetFacing(GetAngle(object));
     init.Launch();
 }

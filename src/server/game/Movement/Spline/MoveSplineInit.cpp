@@ -55,10 +55,10 @@ namespace Movement
         return MOVE_RUN;
     }
 
-    void MoveSplineInit::Launch()
+    int32 MoveSplineInit::Launch()
     {
         if (!unit)
-            return;
+            return 0;
 
         MoveSpline& move_spline = *unit->movespline;
         Location real_position;
@@ -89,7 +89,7 @@ namespace Movement
 
         // should i do the things that user should do? - no.
         if (args.path.empty())
-            return;
+            return 0;
 
         // correct first vertex
         args.path[0] = real_position;
@@ -125,6 +125,8 @@ namespace Movement
         WorldPacket data(SMSG_MONSTER_MOVE, 64);
         PacketBuilder::WriteMonsterMove(move_spline, data, unit);
         unit->SendMessageToSet(&data, true);
+
+        return move_spline.Duration();
     }
 
     void MoveSplineInit::Stop(bool force)
