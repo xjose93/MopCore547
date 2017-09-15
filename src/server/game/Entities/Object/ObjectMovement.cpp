@@ -668,8 +668,34 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, 
 {
     GetNearPoint2D(x, y, distance2d + searcher_size, absAngle);
     z = GetPositionZ();
-    if (!searcher || !searcher->ToCreature() || !searcher->GetMap()->Instanceable())
+    UpdateAllowedPositionZ(x, y, z);
+
+    if (!sWorld->getBoolConfig(CONFIG_DETECT_POS_COLLISION))
+        return;
+
+    // return if the point is already in LoS
+    if (IsWithinLOS(x, y, z))
+        return;
+
+    // remember first point
+    float first_x = x;
+    float first_y = y;
+    float first_z = z;
+
+    // loop in a circle to look for a point in LoS using small steps
+    for (float angle = float(M_PI) / 8; angle < float(M_PI) * 2; angle += float(M_PI) / 8)
+    {
+        GetNearPoint2D(x, y, distance2d + searcher_size, absAngle + angle);
+        z = GetPositionZ();
         UpdateAllowedPositionZ(x, y, z);
+        if (IsWithinLOS(x, y, z))
+            return;
+    }
+
+    // still not in LoS, give up and return first position found
+    x = first_x;
+    y = first_y;
+    z = first_z;
 }
 
 void WorldObject::GetClosePoint(float &x, float &y, float &z, float size, float distance2d /*= 0*/, float angle /*= 0*/) const
@@ -781,10 +807,35 @@ void WorldObject::MovePosition(Position &pos, float dist, float angle)
     pos.SetOrientation(GetOrientation());
 }
 
+float NormalizeZforCollision(WorldObject* obj, float x, float y, float z)
+{
+    float ground = obj->GetMap()->GetHeight(obj->GetPhaseMask(), x, y, MAX_HEIGHT, true);
+    float floor = obj->GetMap()->GetHeight(obj->GetPhaseMask(), x, y, z + 2.0f, true);
+    float helper = std::fabs(ground - z) <= std::fabs(floor - z) ? ground : floor;
+    if (z > helper) // must be above ground
+    {
+        if (Unit* unit = obj->ToUnit())
+        {
+            if (unit->CanFly())
+                return z;
+        }
+        LiquidData liquid_status;
+        ZLiquidStatus res = obj->GetMap()->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquid_status);
+        if (res && liquid_status.level > helper) // water must be above ground
+        {
+            if (liquid_status.level > z) // z is underwater
+                return z;
+            else
+                return std::fabs(liquid_status.level - z) <= std::fabs(helper - z) ? liquid_status.level : helper;
+        }
+    }
+    return helper;
+}
+
 void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float angle)
 {
     angle += GetOrientation();
-    float destx, desty, destz, ground, floor;
+    float destx, desty, destz;
     pos.m_positionZ += 2.0f;
     destx = pos.m_positionX + dist * std::cos(angle);
     desty = pos.m_positionY + dist * std::sin(angle);
@@ -796,10 +847,7 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
         return;
     }
 
-    ground = GetMap()->GetHeight(GetPhaseMask(), destx, desty, MAX_HEIGHT, true);
-    floor = GetMap()->GetHeight(GetPhaseMask(), destx, desty, pos.m_positionZ, true);
-    destz = fabs(ground - pos.m_positionZ) <= fabs(floor - pos.m_positionZ) ? ground : floor;
-
+    destz = NormalizeZforCollision(this, destx, desty, pos.GetPositionZ());
     bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(GetMapId(), pos.m_positionX, pos.m_positionY, pos.m_positionZ + 0.5f, destx, desty, destz + 0.5f, destx, desty, destz, -0.5f);
 
     // collision occurred
@@ -831,9 +879,7 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
         {
             destx -= step * std::cos(angle);
             desty -= step * std::sin(angle);
-            ground = GetMap()->GetHeight(GetPhaseMask(), destx, desty, MAX_HEIGHT, true);
-            floor = GetMap()->GetHeight(GetPhaseMask(), destx, desty, pos.m_positionZ, true);
-            destz = fabs(ground - pos.m_positionZ) <= fabs(floor - pos.m_positionZ) ? ground : floor;
+            destz = NormalizeZforCollision(this, destx, desty, pos.GetPositionZ());
         }
         // we have correct destz now
         else
@@ -845,7 +891,7 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
 
     MoPCore::NormalizeMapCoord(pos.m_positionX);
     MoPCore::NormalizeMapCoord(pos.m_positionY);
-    UpdateAllowedPositionZ(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
+    pos.m_positionZ = NormalizeZforCollision(this, destx, desty, pos.GetPositionZ());
     pos.SetOrientation(GetOrientation());
 }
 
@@ -931,67 +977,68 @@ void WorldObject::UpdateGroundPositionZ(float x, float y, float &z) const
 void WorldObject::UpdateAllowedPositionZ(float x, float y, float &z) const
 {
     // Return this for now since MMAPS are not implemented and this prevents proper movement for creatures on Transports / Elevators.
-    return;
+    if (GetTransport())
+        return;
 
     switch (GetTypeId())
     {
-    case TYPEID_UNIT:
-    {
-                        // non fly unit don't must be in air
-                        // non swim unit must be at ground (mostly speedup, because it don't must be in water and water level check less fast
-                        if (!ToCreature()->CanFly())
-                        {
-                            bool canSwim = ToCreature()->isPet() ? true : ToCreature()->canSwim();
-                            float ground_z = z;
-                            float max_z = canSwim
-                                ? GetMap()->GetWaterOrGroundLevel(x, y, z, &ground_z, !ToUnit()->HasAuraType(SPELL_AURA_WATER_WALK))
-                                : ((ground_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true)));
-                            if (max_z > INVALID_HEIGHT)
-                            {
-                                if (z > max_z)
-                                    z = max_z;
-                                else if (z < ground_z)
-                                    z = ground_z;
-                            }
-                        }
-                        else
-                        {
-                            float ground_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true);
-                            if (z < ground_z)
-                                z = ground_z;
-                        }
-                        break;
-    }
-    case TYPEID_PLAYER:
-    {
-                          // for server controlled moves playr work same as creature (but it can always swim)
-                          if (!ToPlayer()->CanFly())
-                          {
-                              float ground_z = z;
-                              float max_z = GetMap()->GetWaterOrGroundLevel(x, y, z, &ground_z, !ToUnit()->HasAuraType(SPELL_AURA_WATER_WALK));
-                              if (max_z > INVALID_HEIGHT)
-                              {
-                                  if (z > max_z)
-                                      z = max_z;
-                                  else if (z < ground_z)
-                                      z = ground_z;
-                              }
-                          }
-                          else
-                          {
-                              float ground_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true);
-                              if (z < ground_z)
-                                  z = ground_z;
-                          }
-                          break;
-    }
-    default:
-    {
-               float ground_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true);
-               if (ground_z > INVALID_HEIGHT)
-                   z = ground_z;
-               break;
-    }
+        case TYPEID_UNIT:
+        {
+            // non fly unit don't must be in air
+            // non swim unit must be at ground (mostly speedup, because it don't must be in water and water level check less fast
+            if (!ToCreature()->CanFly())
+            {
+                bool canSwim = ToCreature()->IsPetGuardianStuff() ? true : ToCreature()->canSwim();
+                float ground_z = z;
+                float max_z = canSwim
+                    ? GetMap()->GetWaterOrGroundLevel(x, y, z, &ground_z, !ToUnit()->HasAuraType(SPELL_AURA_WATER_WALK))
+                    : ((ground_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true)));
+                if (max_z > INVALID_HEIGHT)
+                {
+                    if (z > max_z)
+                        z = max_z;
+                    else if (z < ground_z)
+                        z = ground_z;
+                }
+            }
+            else
+            {
+                float ground_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true);
+                if (z < ground_z)
+                    z = ground_z;
+            }
+            break;
+        }
+        case TYPEID_PLAYER:
+        {
+            // for server controlled moves playr work same as creature (but it can always swim)
+            if (!ToPlayer()->CanFly())
+            {
+                float ground_z = z;
+                float max_z = GetMap()->GetWaterOrGroundLevel(x, y, z, &ground_z, !ToUnit()->HasAuraType(SPELL_AURA_WATER_WALK));
+                if (max_z > INVALID_HEIGHT)
+                {
+                    if (z > max_z)
+                        z = max_z;
+                    else if (z < ground_z)
+                        z = ground_z;
+                }
+            }
+            else
+            {
+                float ground_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true);
+                if (z < ground_z)
+                    z = ground_z;
+            }
+            break;
+        }
+        default:
+        {
+            float ground_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true);
+            if (ground_z > INVALID_HEIGHT)
+                z = ground_z;
+            break;
+        }
     }
 }
 

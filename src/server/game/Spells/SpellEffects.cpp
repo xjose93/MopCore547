@@ -7469,7 +7469,10 @@ void Spell::EffectCharge(SpellEffIndex effIndex)
             m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ, speed, EVENT_CHARGE, false, unitTarget);
         }
         else
+        {
             m_caster->GetMotionMaster()->MoveCharge(*m_preGeneratedPath, speed, unitTarget);
+            m_preGeneratedPath->Clear();
+        }
     }
 
     if (effectHandleMode == SPELL_EFFECT_HANDLE_HIT_TARGET)

@@ -496,7 +496,7 @@ SpellValue::SpellValue(SpellInfo const* proto)
 Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags, uint64 originalCasterGUID, bool skipCheck) :
 m_spellInfo(sSpellMgr->GetSpellForDifficultyFromSpell(info, caster)),
 m_caster((info->AttributesEx6 & SPELL_ATTR6_CAST_BY_CHARMER && caster->GetCharmerOrOwner()) ? caster->GetCharmerOrOwner() : caster)
-, m_spellValue(new SpellValue(m_spellInfo))
+, m_spellValue(new SpellValue(m_spellInfo)), m_preGeneratedPath(new PathGenerator(m_caster))
 {
     m_spellPowerData = m_caster->GetSpellPowerEntryBySpell(m_spellInfo);
     m_customError = SPELL_CUSTOM_ERROR_NONE;
@@ -7148,7 +7148,6 @@ SpellCastResult Spell::CheckCast(bool strict)
                         float objSize = target->GetObjectSize();
                         float range = m_spellInfo->GetMaxRange(true, m_caster, this) * 1.5f + objSize; // can't be overly strict
 
-                        m_preGeneratedPath = std::unique_ptr<PathGenerator>(new PathGenerator(m_caster)); // MoPCore::make_unique<PathGenerator>(m_caster);
                         m_preGeneratedPath->SetPathLengthLimit(range);
                         // first try with raycast, if it fails fall back to normal path
                         float targetObjectSize = std::min(target->GetObjectSize(), 4.0f);

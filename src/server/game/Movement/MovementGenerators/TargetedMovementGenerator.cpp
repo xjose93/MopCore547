@@ -25,34 +25,38 @@
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
 #include "Player.h"
-
+#include "VMapFactory.h"
 #include <cmath>
 
 
 template<class T, typename D>
-void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool updateDestination)
+void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool updateDestination)
 {
     if (!i_target.isValid() || !i_target->IsInWorld())
         return;
 
-    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE))
-        return;
+    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || owner->HasUnitState(UNIT_STATE_LOST_CONTROL))
+		return;
 
-    // This is hacky. ToDo: remove.
-    if (owner->GetTypeId() == TYPEID_UNIT)
-    {
-        switch(owner->GetEntry())
+	if (owner->GetTypeId() == TYPEID_UNIT && !i_target->isInAccessiblePlaceFor(owner->ToCreature()))
+	{
+		if (owner->HasUnitState(UNIT_STATE_CASTING))
+			return;
+	}
+
+	if (owner->GetTypeId() == TYPEID_UNIT)
+	{
+        switch (owner->GetEntry())
         {
-            case 52498: // Beth'tilac.
-                if (owner->GetMapId() == 720 && owner->GetAI()->GetData(2) == 0 && (i_target->GetPositionZ() < 100.0f || i_target->IsPetGuardianStuff()))
+            case 52498: // Beth'tilac
+                if (owner->GetMapId() == 720 && owner->GetAI()->GetData(2) == 0 && (i_target->GetPositionZ() < 100.0f))
                     return;
                 break;
-            case 52581: // Cinderweb Drone.
-            case 52447: // Cinderweb Spiderling.
-            case 53745: // Engorged Broodling.
-                if (owner->GetMapId() == 720)
-                    if (i_target->GetPositionZ() > 100.0f)
-                        return;
+            case 52581: // Cinderweb Drone
+            case 52447: // Cinderweb Spiderling
+            case 53745: // Engorged Broodling
+                if (owner->GetMapId() == 720 && i_target->GetPositionZ() > 100.0f)
+                    return;
                 break;
             case 56923: // Twilight Sapper
                 if (owner->GetMotionMaster()->GetMotionSlot(MOTION_SLOT_CONTROLLED))
@@ -62,37 +66,51 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool upd
             case 45871:
             case 45872:
             case 45812:
+            {
                 if (Creature* creature = owner->ToCreature())
+                {
                     if (creature->GetHomePosition().GetExactDist2d(i_target->GetPositionX(), i_target->GetPositionY()) > 60.0f)
                         return;
+                }
+                break;
+            }
+            default:
                 break;
         }
-    }
+	}
 
-    float x, y, z;
+	float x = 0.0f;
+	float y = 0.0f;
+	float z = 0.0f;
 
     if (updateDestination || !i_path)
     {
         if (!i_offset)
         {
-            if (i_target->IsWithinMeleeRange(owner))
+            if (i_target->IsWithinDistInMap(owner, CONTACT_DISTANCE))
                 return;
 
-            // To nearest random contact position.
-            i_target->GetRandomContactPoint(owner, x, y, z, 0, MELEE_RANGE - 0.5f);
+            if (owner->isPet() && i_target->GetTypeId() == TYPEID_UNIT)
+            {
+                Position pos;
+                i_target->GetFirstCollisionPosition(pos, owner->GetCombatReach() + CONTACT_DISTANCE, static_cast<float>(M_PI));
+                x = pos.GetPositionX();
+                y = pos.GetPositionY();
+                z = pos.GetPositionZ();
+            }
+            else
+                i_target->GetContactPoint(owner, x, y, z);
         }
         else
         {
-            float dist;
-            float size;
+            float dist = 0.0f;
+            float size = 0.0f;
 
             // Pets need special handling.
-            // We need to subtract GetObjectSize() because it gets added back further down the chain
-            //  and that makes pets too far away. Subtracting it allows pets to properly
-            //  be (GetCombatReach() + i_offset) away.
-            // Only applies when i_target is pet's owner otherwise pets and mobs end up
-            //   doing a "dance" while fighting
-            if (owner->isPet() && i_target->GetTypeId() == TYPEID_PLAYER)
+            // We need to subtract GetObjectSize() because it gets added back further down the chain, and that makes pets too far away.
+            // Subtracting it allows pets to properly be (GetCombatReach() + i_offset) away.
+            // Only applies when i_target is pet's owner otherwise pets and mobs end up doing a "dance" while fighting.
+            if (owner->IsPetGuardianStuff() && i_target->GetTypeId() == TYPEID_PLAYER)
             {
                 dist = 1.0f; //i_target->GetCombatReach();
                 size = 1.0f; //i_target->GetCombatReach() - i_target->GetObjectSize();
@@ -100,13 +118,13 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool upd
             else
             {
                 dist = i_offset + 1.0f;
-                size = owner->GetObjectSize();
+                size = owner->GetCombatReach();
             }
 
             if (i_target->IsWithinDistInMap(owner, dist))
                 return;
 
-            // To at i_offset distance from target and i_angle from target facing.
+            // to at i_offset distance from target and i_angle from target facing
             i_target->GetClosePoint(x, y, z, size, i_offset, i_angle);
         }
     }
@@ -123,30 +141,38 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool upd
         i_path = new PathGenerator(owner);
 
     // allow pets to use shortcut if no path found when following their master
-    bool forceDest = (owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->isPet()
-        && owner->HasUnitState(UNIT_STATE_FOLLOW));
+    bool forceDest = (owner->GetTypeId() == TYPEID_UNIT && owner->IsPetGuardianStuff() && owner->HasUnitState(UNIT_STATE_FOLLOW));
 
     bool result = i_path->CalculatePath(x, y, z, forceDest);
     if (!result || (i_path->GetPathType() & PATHFIND_NOPATH))
     {
-        // can't reach target
-        i_recalculateTravel = true;
-        return;
+        if (owner->HasUnitState(UNIT_STATE_FOLLOW))
+        {
+            Movement::MoveSplineInit init(owner);
+            init.MoveTo(x, y, z, false, true);
+            init.Launch();
+        }
+        else
+        {
+            // can't reach target
+            i_recalculateTravel = true;
+            return;
+        }
     }
-
 
     D::_addUnitStateMove(owner);
     i_targetReached = false;
     i_recalculateTravel = false;
-
-    owner->UpdateAllowedPositionZ(x, y, z);
+    owner->AddUnitState(UNIT_STATE_CHASE);
 
     Movement::MoveSplineInit init(owner);
     init.MovebyPath(i_path->GetPath());
     init.SetWalk(((D*)this)->EnableWalking());
-    // Using the same condition for facing target as the one that is used for SetInFront on movement end - applies to ChaseMovementGenerator mostly.
+    // Using the same condition for facing target as the one that is used for SetInFront on movement end
+    // - applies to ChaseMovementGenerator mostly
     if (i_angle == 0.f)
         init.SetFacing(i_target.getTarget());
+
     init.Launch();
 }
 
@@ -179,13 +205,7 @@ void TargetedMovementGeneratorMedium<Creature,FollowMovementGenerator<Creature> 
 template<class T, typename D>
 bool TargetedMovementGeneratorMedium<T,D>::DoUpdate(T* owner, uint32 diff)
 {
-    if (!i_target.isValid() || !i_target->IsInWorld())
-        return false;
-
-    if (!owner)
-        return false;
-
-    if (!owner->IsAlive())
+    if (!i_target.isValid() || !i_target->IsInWorld() || !owner || !owner->IsAlive())
         return false;
 
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE))
@@ -227,7 +247,7 @@ bool TargetedMovementGeneratorMedium<T,D>::DoUpdate(T* owner, uint32 diff)
         // More distance let have better performance, less distance let have more sensitive reaction at target move.
         float allowed_dist = 0.0f;
 
-        if (owner->isPet() && (owner->GetCharmerOrOwnerGUID() == i_target->GetGUID()))
+        if (owner->ToCreature()->IsPetGuardianStuff() && (owner->GetCharmerOrOwnerGUID() == i_target->GetGUID()))
             allowed_dist = 1.0f; // pet following owner
         else
             allowed_dist = owner->GetCombatReach() + sWorld->getRate(RATE_TARGET_POS_RECALCULATION_RANGE);
@@ -369,7 +389,7 @@ void FollowMovementGenerator<Creature>::_updateSpeed(Creature* owner)
         return;
 
     // Pet only syncs speed with owner.
-    if (!owner->isPet() || !i_target.isValid())
+    if (!owner->IsPetGuardianStuff() || !i_target.isValid())
         return;
 
     if (i_target->GetGUID() != owner->GetOwnerGUID())

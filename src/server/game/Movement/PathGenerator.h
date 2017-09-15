@@ -76,6 +76,12 @@ class PathGenerator
 
         void ReducePathLenghtByDist(float dist); // path must be already built
 
+        void Clear()
+        {
+            _polyLength = 0;
+            _pathPoints.clear();
+        }
+
     private:
 
         dtPolyRef _pathPolyRefs[MAX_PATH_LENGTH];   // array of detour polygon references
@@ -103,12 +109,6 @@ class PathGenerator
         void SetEndPosition(G3D::Vector3 const& point) { _actualEndPosition = point; _endPosition = point; }
         void SetActualEndPosition(G3D::Vector3 const& point) { _actualEndPosition = point; }
         void NormalizePath();
-
-        void Clear()
-        {
-            _polyLength = 0;
-            _pathPoints.clear();
-        }
 
         bool InRange(G3D::Vector3 const& p1, G3D::Vector3 const& p2, float r, float h) const;
         float Dist3DSqr(G3D::Vector3 const& p1, G3D::Vector3 const& p2) const;

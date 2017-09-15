@@ -775,7 +775,7 @@ class Spell
 
         bool m_skipCheck;
         uint32 m_auraScaleMask;
-        std::unique_ptr<PathGenerator> m_preGeneratedPath;
+        PathGenerator* m_preGeneratedPath;
 
         typedef std::map<uint32, SpellLogHelper> LogHelperMap;
         LogHelperMap m_effectExecuteData;
