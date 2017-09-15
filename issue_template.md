@@ -17,7 +17,7 @@ Tell us what should happen instead.
 
 **Steps to reproduce the problem:**
 
-1. CHANGEME Step 1 include entries of affected creatures / items / quests with a link to the relevant wowhead page.  
+1. Step 1 include entries of affected creatures / items / quests with a link to the relevant wowhead page.  
 2. Step 2
 3. Step 3
 
@@ -25,7 +25,7 @@ Tell us what should happen instead.
 
 **Rev. hash/commit:** 
 
-Copy the first line of the `worldserver`, `authserver` or `bnetserver` startup.
+Copy the first line of the `worldserver`, `authserver` startup.
 For example: MopCore547 rev. 0000000000 2000-01-09 11:31:41 +0100 (my branch) (Win64, RelWithDebInfo, Static) (bnetserver)
 
 
