@@ -232,42 +232,6 @@ CREATE TABLE `realmlist` (
 
 INSERT INTO `realmlist` (`id`,`name`,`address`,`port`,`icon`,`flag`,`timezone`,`allowedSecurityLevel`,`population`,`gamebuild`,`online`) VALUES (1,'MopCore547','127.0.0.1',8085,6,0,12,0,0,18019,1);
 
-/*Table structure for table `transferts` */
-
-DROP TABLE IF EXISTS `transferts`;
-
-CREATE TABLE `transferts` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `account` int(11) NOT NULL,
-  `perso_guid` int(11) NOT NULL,
-  `from` int(11) NOT NULL,
-  `to` int(11) NOT NULL,
-  `revision` blob NOT NULL,
-  `dump` longtext NOT NULL,
-  `last_error` blob NOT NULL,
-  `nb_attempt` int(11) NOT NULL,
-  `state` int(10) DEFAULT NULL,
-  `error` int(10) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-/*Data for the table `transferts` */
-
-/*Table structure for table `transferts_logs` */
-
-DROP TABLE IF EXISTS `transferts_logs`;
-
-CREATE TABLE `transferts_logs` (
-  `id` int(11) DEFAULT NULL,
-  `account` int(11) DEFAULT NULL,
-  `perso_guid` int(11) DEFAULT NULL,
-  `from` int(2) DEFAULT NULL,
-  `to` int(2) DEFAULT NULL,
-  `dump` longtext
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-/*Data for the table `transferts_logs` */
-
 /*Table structure for table `uptime` */
 
 DROP TABLE IF EXISTS `uptime`;
